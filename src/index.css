@@ -1,111 +1,95 @@
+/* ============================================================
+   @IMPORTS — layout components
+   ============================================================ */
+@import "./components/layout/app-shell/app-shell.css";
+@import "./components/layout/sidebar/sidebar.css";
+@import "./components/layout/topbar/topbar.css";
+@import "./components/layout/status-bar/status-bar.css";
+@import "./components/layout/assistant-panel/assistant-panel.css";
+@import "./components/layout/detail-drawer/detail-drawer.css";
+@import "./components/layout/toasts/toasts.css";
+@import "./components/layout/audit-companion/audit-companion.css";
+
+/* ============================================================
+   @IMPORTS — common components
+   ============================================================ */
+@import "./components/common/card/card.css";
+@import "./components/common/button/button.css";
+@import "./components/common/tag/tag.css";
+@import "./components/common/page-heading/page-heading.css";
+@import "./components/common/metric-grid/metric-grid.css";
+@import "./components/common/generic-table/generic-table.css";
+@import "./components/common/brief-card/brief-card.css";
+@import "./components/common/list/list.css";
+
+/* ============================================================
+   @IMPORTS — page components
+   ============================================================ */
+@import "./components/today/today.css";
+@import "./components/portfolios/portfolios.css";
+@import "./components/funds/funds.css";
+@import "./components/managers/managers.css";
+@import "./components/rebalance/rebalance.css";
+@import "./components/risk/risk.css";
+@import "./components/fees/fees.css";
+@import "./components/calendar/calendar.css";
+@import "./components/notes/notes.css";
+@import "./components/data-health/data-health.css";
+@import "./components/audit/audit.css";
+@import "./components/generic-page/generic-page.css";
+
+/* ============================================================
+   GLOBAL DESIGN TOKENS — all colours, fonts, spacing, radii
+   ============================================================ */
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  color-scheme: dark;
+  --page: #12171d;
+  --sidebar: #1b222a;
+  --panel: #1c232c;
+  --panel-hover: #242d37;
+  --panel-soft: #171d24;
+  --line: #303943;
+  --line-soft: #28313a;
+  --text: #e6e9ed;
+  --muted: #9aa3ad;
+  --quiet: #727d88;
+  --green: #8bc7ac;
+  --green-strong: #75c19a;
+  --amber: #e7c47c;
+  --red: #df747c;
+  --sidebar-width: 190px;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
+/* ============================================================
+   GLOBAL RESET
+   ============================================================ */
+* { box-sizing: border-box; }
 
 body {
+  min-width: 360px;
+  min-height: 100vh;
   margin: 0;
+  background: var(--page);
+  color: var(--text);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+button, input, textarea { font: inherit; }
+button { color: inherit; }
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

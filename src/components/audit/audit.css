@@ -1,0 +1,76 @@
+body.audit-active .page-content { padding-top: 0; }
+
+.audit-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 14px 0 0;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 24px;
+}
+
+.audit-tab {
+  padding: 8px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 580;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color .15s, border-color .15s;
+}
+.audit-tab:hover { color: var(--text); }
+.audit-tab.active { color: var(--text); border-bottom-color: var(--green); font-weight: 650; }
+
+.audit-trail { display: grid; gap: 6px; }
+.audit-entry {
+  display: grid;
+  grid-template-columns: 160px 1fr auto;
+  align-items: start;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.audit-entry-time { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.audit-entry-desc { }
+.audit-entry-user { color: var(--quiet); font-size: 12px; white-space: nowrap; }
+
+.audit-role-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.role-card {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+}
+.role-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.role-card-name { font-size: 13px; font-weight: 650; }
+.role-card-permissions { display: flex; flex-wrap: wrap; gap: 4px; }
+
+.approval-queue { display: grid; gap: 8px; }
+.approval-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: var(--panel);
+  border-left: 3px solid var(--amber);
+  font-size: 13px;
+}
+.approval-item.approved { border-left-color: var(--green); }
+.approval-item-body { flex: 1; }
+.approval-item-title { font-weight: 620; }
+.approval-item-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.approval-actions { display: flex; gap: 6px; }
+
+@media (max-width: 760px) {
+  .audit-entry { grid-template-columns: 1fr; gap: 4px; }
+}

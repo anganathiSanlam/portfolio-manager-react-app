@@ -1,0 +1,24 @@
+.statusbar {
+  display: flex;
+  height: 36px;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 20px;
+  padding: 0 24px;
+  background: var(--sidebar);
+  border-bottom: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--muted);
+  overflow-x: auto;
+}
+
+.statusbar-item { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+.statusbar-item strong { color: var(--text); font-weight: 600; }
+.statusbar-sep { color: var(--line); }
+.statusbar-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.statusbar-dot.amber { background: var(--amber); }
+.statusbar-dot.red { background: var(--red); }
+
+@media (max-width: 760px) {
+  .statusbar { padding: 0 14px; gap: 14px; }
+}

@@ -1,0 +1,33 @@
+.metric-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  margin-bottom: 24px;
+}
+
+.metric-card {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--panel);
+}
+
+.metric-label { font-size: 11px; color: var(--muted); font-weight: 580; letter-spacing: .02em; }
+.metric-value {
+  margin-top: 5px;
+  font-size: 24px;
+  font-weight: 680;
+  letter-spacing: -.6px;
+  font-variant-numeric: tabular-nums;
+}
+.metric-value.green { color: var(--green); }
+.metric-value.amber { color: var(--amber); }
+.metric-value.red   { color: var(--red); }
+
+.metric-delta {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.metric-delta.up   { color: var(--green); }
+.metric-delta.down { color: var(--red); }

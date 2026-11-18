@@ -1,0 +1,58 @@
+body.risk-active .page-content { background: var(--page); }
+
+.risk-layout { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; }
+
+.risk-band-wrap { margin: 16px 0; }
+.risk-band {
+  height: 20px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--green) 0%, var(--amber) 50%, var(--red) 100%);
+  position: relative;
+}
+.risk-band-marker {
+  position: absolute;
+  top: -4px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--text);
+  border: 3px solid var(--page);
+  transform: translateX(-50%);
+  box-shadow: 0 2px 8px rgba(0,0,0,.4);
+}
+.risk-band-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.mandate-grid { display: grid; gap: 10px; }
+.mandate-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--panel-soft);
+  font-size: 13px;
+}
+.mandate-label { color: var(--muted); font-size: 12px; }
+.mandate-value { font-weight: 600; }
+.mandate-status { }
+
+.breach-list { display: grid; gap: 6px; }
+.breach-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--red);
+  border-radius: 0 8px 8px 0;
+  background: rgba(223,116,124,.07);
+  font-size: 13px;
+}
+.breach-item.warning { border-color: var(--amber); background: rgba(231,196,124,.06); }
+
+@media (max-width: 920px) { .risk-layout { grid-template-columns: 1fr; } }

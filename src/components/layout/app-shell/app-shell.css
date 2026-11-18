@@ -1,0 +1,27 @@
+.app-shell { display: flex; min-height: 100vh; }
+
+.main-area {
+  display: flex;
+  height: 100vh;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  margin-left: var(--sidebar-width);
+  margin-right: 214px;
+}
+
+.content-scroll { min-height: 0; width: 100%; flex: 1; overflow: auto; }
+.page-content { width: min(100%, 1540px); margin: 0 auto; padding: 38px 40px 90px; }
+
+/* Body-class page modifiers */
+.audit-active .page-content { padding-top: 0; }
+
+@media (max-width: 1100px) {
+  .main-area { margin-right: 0; }
+}
+
+@media (max-width: 760px) {
+  .main-area { margin-left: 0; }
+  .page-content { padding: 28px 17px 80px; }
+}

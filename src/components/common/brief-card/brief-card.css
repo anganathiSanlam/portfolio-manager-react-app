@@ -1,0 +1,35 @@
+.brief-card {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--panel);
+}
+
+.brief-card + .brief-card { margin-top: 10px; }
+
+.brief-card-title {
+  font-size: 13px;
+  font-weight: 650;
+  margin-bottom: 6px;
+}
+
+.brief-card-body { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+.why-panel {
+  padding: 14px 16px;
+  border: 1px solid rgba(231,196,124,.25);
+  border-radius: 10px;
+  background: rgba(231,196,124,.06);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+  margin-top: 12px;
+}
+.why-panel-label {
+  font-size: 11px;
+  font-weight: 650;
+  color: var(--amber);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}

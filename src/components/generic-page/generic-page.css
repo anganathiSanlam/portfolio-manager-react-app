@@ -1,0 +1,45 @@
+.generic-page { max-width: 760px; }
+
+.generic-page-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.generic-page h1 { font-size: 22px; font-weight: 710; letter-spacing: -.5px; margin: 0 0 6px; }
+.generic-page-lead { font-size: 15px; color: var(--muted); line-height: 1.6; margin-bottom: 28px; }
+
+.feature-list { display: grid; gap: 10px; }
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+}
+.feature-icon { flex-shrink: 0; font-size: 18px; }
+.feature-title { font-size: 14px; font-weight: 640; }
+.feature-desc { font-size: 13px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+
+.agents-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+
+.agent-card {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--panel);
+}
+.agent-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.agent-status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.agent-status-dot.paused { background: var(--muted); }
+.agent-name { font-size: 14px; font-weight: 650; }
+.agent-desc { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
+.agent-last-run { font-size: 11px; color: var(--quiet); }

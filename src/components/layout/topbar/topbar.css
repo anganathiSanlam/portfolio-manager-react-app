@@ -1,0 +1,52 @@
+.topbar {
+  display: flex;
+  height: 56px;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 10px;
+  padding: 0 24px;
+  background: var(--sidebar);
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar-title { flex: 1; font-size: 16px; font-weight: 650; letter-spacing: -.3px; }
+.topbar-sub { color: var(--muted); font-size: 12px; font-weight: 400; }
+
+.topbar-actions { display: flex; align-items: center; gap: 8px; }
+
+.icon-btn {
+  display: inline-grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.icon-btn:hover { background: #252e38; border-color: #3a4652; color: var(--text); }
+.icon-btn.active { background: #252e38; border-color: #3a4652; color: var(--green); }
+
+.portfolio-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text);
+  transition: background .15s, border-color .15s;
+}
+.portfolio-select:hover { background: var(--panel-hover); border-color: #3a4652; }
+.portfolio-select-name { font-weight: 600; }
+.portfolio-select-arrow { color: var(--muted); font-size: 11px; }
+
+@media (max-width: 760px) {
+  .topbar { padding: 0 14px; }
+  .topbar-title { font-size: 14px; }
+}
