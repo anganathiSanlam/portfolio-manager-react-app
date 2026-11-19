@@ -115,6 +115,12 @@ export const demoRoles: DemoRole[] = [
 ];
 
 export const pageData: Record<string, PageDataEntry> = {
+  today: {
+    eyebrow: "DAILY OVERVIEW", title: "Today",
+    subtitle: "Moderate portfolio · evidence first, decisions in your hands.",
+    metrics: [["AUM", "R4.82bn", "+R150m inflow today"], ["1-day return", "+0.24%", "Bench +0.19%"], ["Open actions", "3", "2 need your approval"], ["Agents", "5 running", "No errors"]],
+    insight: ["Action needed", "New cash waiting to be allocated.", "R150m arrived this morning. A rebalance proposal is ready to review — no sales required, all mandates would remain within limits.", "Review proposal"]
+  },
   portfolios: {
     eyebrow: "PORTFOLIO UNIVERSE", title: "Portfolios",
     subtitle: "A clear view of performance, positioning, and decisions across your book.",
@@ -159,6 +165,12 @@ export const pageData: Record<string, PageDataEntry> = {
     tableTitle: "Mandate checks",
     columns: ["Portfolio", "Rule", "Current", "Limit", "Headroom", "Result"],
     rows: [["Moderate portfolio", "Listed equity", "63.0%", "65.0%", "2.0%", "Within limit"], ["Moderate portfolio", "Single manager", "18.0%", "25.0%", "7.0%", "Within limit"], ["Aggressive portfolio", "Offshore exposure", "38.4%", "40.0%", "1.6%", "Watch"], ["Conservative portfolio", "Below investment grade", "6.2%", "10.0%", "3.8%", "Within limit"]]
+  },
+  fees: {
+    eyebrow: "COST MANAGEMENT", title: "Fees & costs",
+    subtitle: "Understand what you are paying, track savings, and keep fee agreements current.",
+    metrics: [["Total fund cost", "0.74%", "Weighted average TER"], ["Savings identified", "R2.4m", "vs prior schedule · annualised"], ["Fee reviews due", "2", "Northstar and Umzi"], ["Negotiation active", "1", "Umzi scale step-down"]],
+    insight: ["Fee opportunity", "Northstar fee is above the agreed schedule.", "Active fee of 1.00% exceeds the agreed range. A draft conversation and supporting evidence are ready for your review.", "Review fee"]
   },
   calendar: {
     eyebrow: "UPCOMING WORK", title: "Calendar",

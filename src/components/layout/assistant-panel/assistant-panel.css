@@ -79,3 +79,42 @@
   transition: background .15s;
 }
 .assistant-send:hover { background: var(--green-strong); }
+
+.assistant-bubble-text { white-space: pre-line; }
+
+.assistant-bubble-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px solid var(--line);
+}
+
+.assistant-screen-link {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--green);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  letter-spacing: 0.01em;
+  transition: opacity .15s;
+}
+.assistant-screen-link:hover { opacity: 0.7; }
+
+.assistant-source {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  opacity: 0.6;
+}
+
+.assistant-freshness {
+  font-size: 10px;
+  color: var(--text);
+  opacity: 0.4;
+  margin-left: auto;
+}

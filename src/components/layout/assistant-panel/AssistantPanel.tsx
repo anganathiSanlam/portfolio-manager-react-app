@@ -5,12 +5,19 @@ import { assistantReply } from "../../../utility/assistantReply";
 interface Message {
   role: "user" | "bot";
   text: string;
+  source?: string;
+  screen?: string;
+  freshness?: string;
 }
 
 export default function AssistantPanel() {
   const { state, dispatch } = useApp();
   const [messages, setMessages] = useState<Message[]>([
-    { role: "bot", text: "Hello! I'm your AI assistant. Ask me about your portfolio, meetings, or any action items." },
+    {
+      role: "bot",
+      text: "Ask me about portfolios, funds, fees, risk limits, the rebalance proposal, upcoming events, managers, or today's brief.",
+      freshness: "Demo data · 19 Nov 2026"
+    },
   ]);
   const [input, setInput] = useState("");
 
@@ -21,7 +28,7 @@ export default function AssistantPanel() {
     setMessages((prev) => [
       ...prev,
       { role: "user", text: trimmed },
-      { role: "bot", text: reply },
+      { role: "bot", text: reply.text, source: reply.source, screen: reply.screen, freshness: reply.freshness },
     ]);
     setInput("");
   }
@@ -48,7 +55,22 @@ export default function AssistantPanel() {
       <div className="assistant-messages">
         {messages.map((m, i) => (
           <div key={i} className={`assistant-bubble ${m.role}`}>
-            {m.text}
+            <div className="assistant-bubble-text">{m.text}</div>
+            {m.role === "bot" && (m.source || m.freshness) && (
+              <div className="assistant-bubble-meta">
+                {m.source && m.screen ? (
+                  <button
+                    className="assistant-screen-link"
+                    onClick={() => dispatch({ type: "SET_SECTION", id: m.screen! })}
+                  >
+                    {m.source} →
+                  </button>
+                ) : m.source ? (
+                  <span className="assistant-source">{m.source}</span>
+                ) : null}
+                {m.freshness && <span className="assistant-freshness">{m.freshness}</span>}
+              </div>
+            )}
           </div>
         ))}
       </div>
