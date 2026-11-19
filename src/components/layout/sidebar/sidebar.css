@@ -50,6 +50,17 @@
 .nav-caption { margin: 24px 14px 8px; font-size: 10px; }
 .main-nav { display: grid; gap: 1px; }
 
+.nav-group-label {
+  display: block;
+  margin: 14px 14px 5px;
+  font-size: 10px;
+  font-weight: 570;
+  letter-spacing: .035em;
+  color: var(--muted);
+  border-top: 1px solid #2a333d;
+  padding-top: 10px;
+}
+
 .nav-item {
   display: grid;
   min-height: 36px;

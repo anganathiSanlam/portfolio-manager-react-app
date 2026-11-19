@@ -3,6 +3,19 @@ export interface NavItem {
   number: string;
   label: string;
   alert?: boolean;
+  groupLabel?: string;
+}
+
+export interface NewsItem {
+  id: string;
+  date: string;
+  time: string;
+  headline: string;
+  summary: string;
+  category: "Market" | "Manager" | "Macro" | "Portfolio";
+  impact: "positive" | "neutral" | "watch";
+  linkedFundId?: string;
+  linkedPortfolio?: string;
 }
 
 export interface Portfolio {

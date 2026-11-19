@@ -15,15 +15,19 @@ export default function Sidebar() {
       <span className="nav-caption">NAVIGATION</span>
       <div className="main-nav">
         {navigation.map((item) => (
-          <button
-            key={item.id}
-            className={`nav-item${state.activeSection === item.id ? " active" : ""}`}
-            onClick={() => dispatch({ type: "SET_SECTION", id: item.id })}
-          >
-            <span className="nav-number">{item.number}</span>
-            <span className="nav-name">{item.label}</span>
-            <span className={`nav-indicator${item.alert ? " has-alert" : ""}`} />
-          </button>
+          <div key={item.id}>
+            {item.groupLabel && (
+              <span className="nav-group-label">{item.groupLabel}</span>
+            )}
+            <button
+              className={`nav-item${state.activeSection === item.id ? " active" : ""}`}
+              onClick={() => dispatch({ type: "SET_SECTION", id: item.id })}
+            >
+              <span className="nav-number">{item.number}</span>
+              <span className="nav-name">{item.label}</span>
+              <span className={`nav-indicator${item.alert ? " has-alert" : ""}`} />
+            </button>
+          </div>
         ))}
       </div>
 

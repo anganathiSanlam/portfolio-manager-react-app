@@ -3,7 +3,6 @@ import { pageData } from "../../data";
 
 const SECTION_ICONS: Record<string, string> = {
   committee: "🏛",
-  reporting: "📊",
   agents: "🤖",
 };
 

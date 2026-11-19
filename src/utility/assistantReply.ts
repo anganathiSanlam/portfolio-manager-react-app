@@ -1,5 +1,5 @@
 import {
-  calendarEvents, fundUniverse, managerUniverse, pageData, auditRecords, noteRecords
+  calendarEvents, fundUniverse, managerUniverse, pageData, auditRecords, noteRecords, newsItems
 } from "../data";
 
 export interface AssistantResponse {
@@ -158,15 +158,18 @@ export function assistantReply(message: string, selectedCalendarDate: string): A
     };
   }
 
-  // Reporting / reports
-  if (/report(ing)?/.test(q)) {
-    const metrics = pageData.reporting?.metrics ?? [];
-    const ready = metrics.find(m => m[0] === "Reports ready");
-    const awaiting = metrics.find(m => m[0] === "Awaiting review");
-    const coverage = metrics.find(m => m[0] === "Data coverage");
+  // News / market updates
+  if (/\bnews\b|market update|update(s)?/.test(q)) {
+    const metrics = pageData.news?.metrics ?? [];
+    const todayMetric = metrics.find(m => m[0] === "Updates today");
+    const watchMetric = metrics.find(m => m[0] === "Flagged for review");
+    const watchItems = newsItems.filter(n => n.impact === "watch");
+    const watchText = watchItems.length
+      ? ` Watch items: ${watchItems.map(n => n.headline).join("; ")}.`
+      : "";
     return {
-      text: `${ready?.[1] ?? "—"} reports ready (${ready?.[2] ?? ""}). ${awaiting?.[1] ?? "—"} awaiting review (${awaiting?.[2] ?? ""}). Data coverage: ${coverage?.[1] ?? "—"}.`,
-      source: "Reporting", screen: "reporting", freshness: `Updated today · demo data`
+      text: `${todayMetric?.[1] ?? "—"} updates today (${todayMetric?.[2] ?? ""}). ${watchMetric?.[1] ?? "—"} flagged for review.${watchText}`,
+      source: "News", screen: "news", freshness: `As of 08:02 · demo data`
     };
   }
 
@@ -215,7 +218,7 @@ export function assistantReply(message: string, selectedCalendarDate: string): A
 
   // Unsupported / unrecognised
   return {
-    text: "I can answer questions about portfolios, funds (Northstar, Umzi, Protea), fees, risk limits, the rebalance proposal, upcoming calendar events, managers, the committee pack, reporting, notes, data health, or today's brief. Try asking about a specific fund, mandate, or event.",
+    text: "I can answer questions about portfolios, funds (Northstar, Umzi, Protea), fees, risk limits, the rebalance proposal, upcoming calendar events, managers, the committee pack, news, notes, data health, or today's brief. Try asking about a specific fund, mandate, or event.",
     freshness: `Demo data · ${DATA_DATE}`
   };
 }

@@ -11,6 +11,8 @@ import Calendar from "./components/calendar/Calendar";
 import Notes from "./components/notes/Notes";
 import DataHealth from "./components/data-health/DataHealth";
 import Audit from "./components/audit/Audit";
+import News from "./components/news/News";
+import "./components/news/news.css";
 import GenericPage from "./components/generic-page/GenericPage";
 
 function PageRouter() {
@@ -28,6 +30,7 @@ function PageRouter() {
     case "notes":       return <Notes />;
     case "data-health": return <DataHealth />;
     case "audit":       return <Audit />;
+    case "news":        return <News />;
     default:            return <GenericPage />;
   }
 }

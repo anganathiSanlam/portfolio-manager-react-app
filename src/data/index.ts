@@ -1,6 +1,6 @@
 import type {
   NavItem, Portfolio, CalendarEvent, Fund, Manager,
-  DemoRole, PageDataEntry, NoteRecord, AuditRecord
+  DemoRole, PageDataEntry, NoteRecord, AuditRecord, NewsItem
 } from "./types";
 
 export const navigation: NavItem[] = [
@@ -13,8 +13,8 @@ export const navigation: NavItem[] = [
   { id: "fees", number: "07", label: "Fees & costs" },
   { id: "calendar", number: "08", label: "Calendar" },
   { id: "notes", number: "09", label: "Notes" },
-  { id: "committee", number: "10", label: "Committee" },
-  { id: "reporting", number: "11", label: "Reporting" },
+  { id: "committee", number: "10", label: "Committee", groupLabel: "GOVERNANCE" },
+  { id: "news", number: "11", label: "News" },
   { id: "agents", number: "12", label: "Agents" },
   { id: "data-health", number: "13", label: "Data health", alert: true },
   { id: "audit", number: "14", label: "Audit trail" }
@@ -193,14 +193,10 @@ export const pageData: Record<string, PageDataEntry> = {
     columns: ["Agenda item", "Portfolio", "Owner", "Evidence", "Due", "Status"],
     rows: [["Moderate portfolio positioning", "Moderate", "Luyolo", "Current", "24 Nov", "Ready"], ["Northstar manager review", "Moderate", "Thandi", "Awaiting input", "26 Nov", "In progress"], ["Quarterly mandate attestations", "All portfolios", "Operations", "Current", "28 Nov", "Ready"], ["Fee schedule and savings", "Moderate", "Luyolo", "Current", "30 Nov", "Ready"]]
   },
-  reporting: {
-    eyebrow: "INSIGHT & DISTRIBUTION", title: "Reporting",
-    subtitle: "Build a trusted view of performance, risk, and fees for every audience.",
-    metrics: [["Reports ready", "8", "For November close"], ["Awaiting review", "2", "Both due this week"], ["Last distribution", "31 Oct", "No delivery issues"], ["Data coverage", "99.2%", "One non-critical exception"]],
-    insight: ["Monthly close", "November reporting is nearly ready.", "Performance, holdings, and mandate data are current. Review two commentary sections before client reports are distributed.", "Review reports"],
-    tableTitle: "Report schedule",
-    columns: ["Report", "Audience", "Period", "Owner", "Last updated", "Status"],
-    rows: [["Moderate portfolio monthly", "Investment team", "Nov 2026", "Luyolo", "Today, 08:12", "Review"], ["Client portfolio statement", "Clients", "Nov 2026", "Operations", "Today, 07:55", "In progress"], ["Committee performance pack", "Committee", "Q4 2026", "Thandi", "Yesterday", "In progress"], ["Manager scorecard", "Investment team", "Q3 2026", "Luyolo", "14 Nov 2026", "Ready"]]
+  news: {
+    eyebrow: "MARKET INTELLIGENCE", title: "News",
+    subtitle: "Market, manager, and macro updates linked to your funds and portfolios.",
+    metrics: [["Updates today", "2", "Market and macro"], ["Flagged for review", "1", "Mandate headroom watch"], ["Manager updates", "1", "Protea team confirmed"], ["As of", "08:02", "19 Nov 2026"]]
   },
   agents: {
     eyebrow: "AI WORKFLOWS", title: "Agents",
@@ -255,4 +251,49 @@ export const auditRecords: AuditRecord[] = [
   { time: "07:20", event: "RB-041 · R150m allocation", proposedBy: "Rebalancing agent", approver: "Pending PM", status: "Draft", type: "proposal", proposal: "RB-041" },
   { time: "07:15", event: "October commentary drafted", proposedBy: "Reporting agent", approver: "Pending PM", status: "Flagged", type: "fund", proposal: "" },
   { time: "16 Nov", event: "RB-040 operations confirmation", proposedBy: "Operations", approver: "Luyolo", status: "Confirmed", type: "proposal", proposal: "RB-040" }
+];
+
+export const newsItems: NewsItem[] = [
+  {
+    id: "us-megacap-concentration",
+    date: "19 Nov 2026", time: "07:45",
+    headline: "US mega-cap concentration continues to rise",
+    summary: "Top-10 US technology stocks now account for a higher share of MSCI World than at any point in the past five years, adding to the concentration risk flagged in Northstar's current review.",
+    category: "Market", impact: "watch", linkedFundId: "northstar"
+  },
+  {
+    id: "mpc-hold-sa-bonds",
+    date: "18 Nov 2026", time: "15:20",
+    headline: "SA bond yields edge lower after MPC holds rates",
+    summary: "The Reserve Bank held the repo rate unchanged, supporting the case for Umzi's current extended-duration position. Yields on 10-year RSA bonds fell 8bps on the day.",
+    category: "Macro", impact: "positive", linkedFundId: "umzi"
+  },
+  {
+    id: "protea-team-confirmed",
+    date: "14 Nov 2026", time: "10:00",
+    headline: "Protea Capital confirms investment team stability",
+    summary: "Protea Capital confirmed no changes to the investment team following last month's research review. The research lead who joined in October has begun contributing to portfolio decisions.",
+    category: "Manager", impact: "positive", linkedFundId: "protea"
+  },
+  {
+    id: "sa-equity-outperforms",
+    date: "13 Nov 2026", time: "08:30",
+    headline: "SA equity outperforms EM peers in October",
+    summary: "The JSE All Share returned +3.4% in October against an EM benchmark of +1.8%, supported by resources and financials. The Moderate portfolio's SA equity sleeve benefited from this relative performance.",
+    category: "Market", impact: "positive", linkedPortfolio: "Moderate portfolio"
+  },
+  {
+    id: "currency-offshore-headroom",
+    date: "12 Nov 2026", time: "09:10",
+    headline: "Rand weakness narrows offshore mandate headroom",
+    summary: "A 2.3% rand depreciation over the past fortnight has pushed the Aggressive portfolio's offshore exposure to 38.4% — approaching the 40% mandate limit currently flagged in Risk & mandates.",
+    category: "Macro", impact: "watch", linkedPortfolio: "Aggressive portfolio"
+  },
+  {
+    id: "global-index-rebalance",
+    date: "11 Nov 2026", time: "16:00",
+    headline: "MSCI index review — no material impact on passive sleeve",
+    summary: "MSCI confirmed annual index review results. Changes to the Global Equity Index fund are within normal rebalancing ranges and are not expected to affect the portfolio's risk profile materially.",
+    category: "Market", impact: "neutral", linkedFundId: "global-index"
+  }
 ];

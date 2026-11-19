@@ -1,0 +1,124 @@
+.news-page {
+  padding: 28px 32px 48px;
+  max-width: 820px;
+}
+
+.news-eyebrow {
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: .1em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.news-title {
+  font-size: 26px;
+  font-weight: 710;
+  letter-spacing: -.5px;
+  margin: 0 0 6px;
+  color: var(--text);
+}
+
+.news-subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 24px;
+}
+
+.news-metrics { margin-bottom: 24px; }
+
+.news-watch-panel { margin-bottom: 28px; }
+
+.news-feed-label {
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: .04em;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.news-feed {
+  display: grid;
+  gap: 10px;
+}
+
+.news-card {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  gap: 14px;
+  align-items: start;
+  padding: 14px 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  border-left-width: 3px;
+  transition: border-color .15s;
+}
+
+.news-impact-positive { border-left-color: var(--green); }
+.news-impact-watch    { border-left-color: var(--amber); }
+.news-impact-neutral  { border-left-color: var(--line); }
+
+.news-card-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.news-impact-positive .news-card-dot { background: var(--green); }
+.news-impact-watch    .news-card-dot { background: var(--amber); }
+.news-impact-neutral  .news-card-dot { background: var(--muted); }
+
+.news-card-body { display: grid; gap: 5px; }
+
+.news-card-headline {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.news-card-summary {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.news-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.news-tag {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 630;
+  letter-spacing: .02em;
+}
+
+.news-tag-category {
+  background: #1e2a35;
+  color: #8ba0b4;
+}
+
+.news-tag-link {
+  background: #1a2b1f;
+  color: var(--green);
+}
+
+.news-card-date {
+  display: grid;
+  gap: 2px;
+  text-align: right;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  padding-top: 2px;
+}
+
+.news-card-time { font-size: 10px; opacity: .6; }
