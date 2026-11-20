@@ -6,14 +6,17 @@ const SECTION_ICONS: Record<string, string> = {
   agents: "🤖",
 };
 
-export default function GenericPage() {
+interface Props { section?: string; }
+
+export default function GenericPage({ section }: Props = {}) {
   const { state } = useApp();
-  const data = pageData[state.activeSection];
+  const id = section ?? state.activeSection;
+  const data = pageData[id];
 
   if (!data) {
     return (
       <div className="generic-page">
-        <h1>{state.activeSection}</h1>
+        <h1>{id}</h1>
         <p className="generic-page-lead">Coming soon.</p>
       </div>
     );
@@ -21,7 +24,7 @@ export default function GenericPage() {
 
   return (
     <div className="generic-page">
-      <div className="generic-page-icon">{SECTION_ICONS[state.activeSection] ?? "📄"}</div>
+      <div className="generic-page-icon">{SECTION_ICONS[id] ?? "📄"}</div>
       {data.eyebrow && (
         <div style={{ fontSize: 10, fontWeight: 650, letterSpacing: ".1em", color: "var(--muted)", marginBottom: 6 }}>
           {data.eyebrow}

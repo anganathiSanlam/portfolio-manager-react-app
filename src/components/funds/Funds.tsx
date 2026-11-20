@@ -73,7 +73,7 @@ export default function Funds() {
             {filtered.map((f) => (
               <tr
                 key={f.id}
-                onClick={() => dispatch({ type: "SET_SELECTED_FUND", id: f.id })}
+                onClick={() => dispatch({ type: "OPEN_DRAWER", title: f.name, description: f.roleSummary, fundId: f.id })}
                 style={{ cursor: "pointer" }}
               >
                 <td>

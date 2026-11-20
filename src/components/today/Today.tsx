@@ -1,56 +1,64 @@
 import { useApp } from "../../context/AppContext";
-import { calendarEvents, pageData } from "../../data";
-import { formatRand } from "../../utility/formatters";
+import { calendarEvents, portfolioMetrics, newsItems } from "../../data";
+
+const AGENT_ACTIVITY = [
+  { label: "Rebalance proposal generated", time: "08:14", detail: "Equity drift +3.2pp detected — review ready" },
+  { label: "Data health check passed",     time: "07:50", detail: "All 12 feeds green · 1 stale feed flagged" },
+  { label: "News digest processed",        time: "07:30", detail: "6 items ingested · 1 linked to SA equity fund" },
+];
+
+const IMPACT_COLOR: Record<string, string> = {
+  positive: "var(--green)",
+  watch: "var(--amber)",
+  neutral: "var(--muted)",
+};
 
 export default function Today() {
   const { state } = useApp();
-  const data = pageData["today"];
+  const m = portfolioMetrics[state.portfolio];
 
-  const todayEvents = calendarEvents.filter(
-    (e) => e.portfolio === state.portfolio || e.portfolio === "all"
-  ).slice(0, 4);
+  const todayEvents = calendarEvents
+    .filter((e) => e.portfolio === state.portfolio || e.portfolio === "all")
+    .slice(0, 4);
+
+  const topNews = newsItems.slice(0, 2);
 
   return (
     <div>
       <div className="page-heading">
         <div className="page-heading-text">
-          <h1>{data.title}</h1>
-          <p className="page-heading-sub">{data.subtitle}</p>
+          <h1>Today</h1>
+          <p className="page-heading-sub">
+            {state.portfolio}
+            <span className="sample-data-label">Sample data</span>
+          </p>
         </div>
       </div>
 
-      {data.metrics && (
-        <div className="metric-grid">
-          {data.metrics.map(([label, value, delta]) => (
-            <div key={label} className="metric-card">
-              <div className="metric-label">{label}</div>
-              <div className="metric-value">{value}</div>
-              <div className="metric-delta">{delta}</div>
-            </div>
-          ))}
+      <div className="metric-grid">
+        <div className="metric-card">
+          <div className="metric-label">AUM</div>
+          <div className="metric-value">{m.aum}</div>
+          <div className="metric-delta">{m.aumDelta}</div>
         </div>
-      )}
+        <div className="metric-card">
+          <div className="metric-label">YTD return</div>
+          <div className="metric-value">{m.ytd}</div>
+          <div className="metric-delta">{m.ytdBench}</div>
+        </div>
+        <div className="metric-card">
+          <div className="metric-label">Today</div>
+          <div className="metric-value">{m.return1d}</div>
+          <div className="metric-delta">{m.return1dBench}</div>
+        </div>
+        <div className="metric-card">
+          <div className="metric-label">Open actions</div>
+          <div className="metric-value">{m.openActions}</div>
+          <div className="metric-delta">Pending review</div>
+        </div>
+      </div>
 
       <div className="today-grid">
-        <div className="card">
-          <div className="card-header">
-            <span className="card-title">Returns snapshot</span>
-          </div>
-          <div className="return-grid">
-            {[
-              ["1 month", "+0.8%", "Bench +0.6%"],
-              ["3 months", "+2.1%", "Bench +1.9%"],
-              ["1 year", formatRand(0) || "+8.4%", "Bench +7.9%"],
-            ].map(([label, value, bench]) => (
-              <div key={label} className="return-card">
-                <div className="return-card-label">{label}</div>
-                <div className="return-card-value green">{value}</div>
-                <div className="return-card-bench">{bench}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         <div className="card">
           <div className="card-header">
             <span className="card-title">Today&apos;s schedule</span>
@@ -71,15 +79,42 @@ export default function Today() {
             )}
           </div>
         </div>
+
+        <div className="card">
+          <div className="card-header">
+            <span className="card-title">News brief</span>
+          </div>
+          <div className="events-list">
+            {topNews.map((n) => (
+              <div key={n.id} className="event-item">
+                <div className="event-time" style={{ color: IMPACT_COLOR[n.impact] }}>{n.category}</div>
+                <div>
+                  <div className="event-title">{n.headline}</div>
+                  <div className="event-sub">{n.time}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {data.insight && (
-        <div className="why-panel" style={{ marginTop: 20 }}>
-          <div className="why-panel-label">{data.insight[0]}</div>
-          <strong>{data.insight[1]}</strong>
-          <p style={{ margin: "6px 0 0" }}>{data.insight[2]}</p>
+      <div className="card" style={{ marginTop: 20 }}>
+        <div className="card-header">
+          <span className="card-title">Handled for you</span>
+          <span style={{ fontSize: 11, color: "var(--muted)" }}>Agents</span>
         </div>
-      )}
+        <div className="events-list">
+          {AGENT_ACTIVITY.map((a) => (
+            <div key={a.label} className="event-item">
+              <div className="event-time">{a.time}</div>
+              <div>
+                <div className="event-title">{a.label}</div>
+                <div className="event-sub">{a.detail}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

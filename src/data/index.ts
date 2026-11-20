@@ -1,23 +1,16 @@
 import type {
   NavItem, Portfolio, CalendarEvent, Fund, Manager,
-  DemoRole, PageDataEntry, NoteRecord, AuditRecord, NewsItem
+  DemoRole, PageDataEntry, NoteRecord, AuditRecord, NewsItem,
+  PortfolioMetrics, ClientOutcome
 } from "./types";
 
 export const navigation: NavItem[] = [
-  { id: "today", number: "01", label: "Today", alert: true },
+  { id: "today",      number: "01", label: "Today",      alert: true },
   { id: "portfolios", number: "02", label: "Portfolios" },
-  { id: "funds", number: "03", label: "Funds" },
-  { id: "managers", number: "04", label: "Managers" },
-  { id: "rebalance", number: "05", label: "Rebalance & flows", alert: true },
-  { id: "risk", number: "06", label: "Risk & mandates" },
-  { id: "fees", number: "07", label: "Fees & costs" },
-  { id: "calendar", number: "08", label: "Calendar" },
-  { id: "notes", number: "09", label: "Notes" },
-  { id: "committee", number: "10", label: "Committee", groupLabel: "GOVERNANCE" },
-  { id: "news", number: "11", label: "News" },
-  { id: "agents", number: "12", label: "Agents" },
-  { id: "data-health", number: "13", label: "Data health", alert: true },
-  { id: "audit", number: "14", label: "Audit trail" }
+  { id: "funds",      number: "03", label: "Funds" },
+  { id: "actions",    number: "04", label: "Actions",    alert: true },
+  { id: "calendar",   number: "05", label: "Calendar" },
+  { id: "control",    number: "06", label: "Control",    alert: true },
 ];
 
 export const portfolios: Portfolio[] = [
@@ -296,4 +289,34 @@ export const newsItems: NewsItem[] = [
     summary: "MSCI confirmed annual index review results. Changes to the Global Equity Index fund are within normal rebalancing ranges and are not expected to affect the portfolio's risk profile materially.",
     category: "Market", impact: "neutral", linkedFundId: "global-index"
   }
+];
+
+export const portfolioMetrics: Record<string, PortfolioMetrics> = {
+  "Moderate portfolio": {
+    aum: "R4.82bn", aumDelta: "+R150m today",
+    return1d: "+0.24%", return1dBench: "Bench +0.19%",
+    return1m: "+0.8%", return3m: "+2.1%", return1y: "+8.4%",
+    ytd: "+8.42%", ytdBench: "Bench +7.90%",
+    equity: "63.0%", openActions: "3"
+  },
+  "Conservative portfolio": {
+    aum: "R2.16bn", aumDelta: "+R24m today",
+    return1d: "+0.18%", return1dBench: "Bench +0.14%",
+    return1m: "+0.5%", return3m: "+1.4%", return1y: "+6.1%",
+    ytd: "+6.12%", ytdBench: "Bench +5.80%",
+    equity: "28.0%", openActions: "1"
+  },
+  "Aggressive portfolio": {
+    aum: "R1.43bn", aumDelta: "+R18m today",
+    return1d: "+0.31%", return1dBench: "Bench +0.25%",
+    return1m: "+1.2%", return3m: "+3.4%", return1y: "+11.1%",
+    ytd: "+11.08%", ytdBench: "Bench +10.20%",
+    equity: "72.0%", openActions: "2"
+  },
+};
+
+export const clientOutcomes: ClientOutcome[] = [
+  { portfolio: "Moderate portfolio",     target: "Inflation + 4% · 5-year horizon", targetReturn: "11.2%", actualReturn: "11.4%", status: "on-track", gap: "+0.2pp" },
+  { portfolio: "Conservative portfolio", target: "Inflation + 2% · 3-year horizon", targetReturn: "9.2%",  actualReturn: "8.1%",  status: "behind",   gap: "−1.1pp" },
+  { portfolio: "Aggressive portfolio",   target: "Inflation + 7% · 7-year horizon", targetReturn: "14.2%", actualReturn: "15.1%", status: "on-track",  gap: "+0.9pp" },
 ];

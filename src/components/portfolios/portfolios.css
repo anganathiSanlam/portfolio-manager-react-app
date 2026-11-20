@@ -42,3 +42,25 @@
 }
 .allocation-legend-item { display: flex; align-items: center; gap: 6px; }
 .allocation-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+/* ---- Client outcomes ---- */
+.outcome-list { display: grid; gap: 12px; }
+
+.outcome-card {
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  transition: border-color .12s;
+}
+.outcome-card.selected { border-color: var(--green); }
+.outcome-card.behind   { border-color: var(--amber); }
+.outcome-card.selected.behind { border-color: var(--red); }
+
+.outcome-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+.outcome-portfolio { font-size: 14px; font-weight: 650; letter-spacing: -.2px; }
+.outcome-target    { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.outcome-metrics { display: flex; gap: 24px; }
+.outcome-metric-label { font-size: 10px; color: var(--muted); margin-bottom: 3px; text-transform: uppercase; letter-spacing: .06em; }
+.outcome-metric-value { font-size: 16px; font-weight: 650; font-variant-numeric: tabular-nums; }

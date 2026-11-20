@@ -7,6 +7,7 @@ interface Message {
   text: string;
   source?: string;
   screen?: string;
+  tab?: string;
   freshness?: string;
 }
 
@@ -28,7 +29,7 @@ export default function AssistantPanel() {
     setMessages((prev) => [
       ...prev,
       { role: "user", text: trimmed },
-      { role: "bot", text: reply.text, source: reply.source, screen: reply.screen, freshness: reply.freshness },
+      { role: "bot", text: reply.text, source: reply.source, screen: reply.screen, tab: reply.tab, freshness: reply.freshness },
     ]);
     setInput("");
   }
@@ -61,7 +62,11 @@ export default function AssistantPanel() {
                 {m.source && m.screen ? (
                   <button
                     className="assistant-screen-link"
-                    onClick={() => dispatch({ type: "SET_SECTION", id: m.screen! })}
+                    onClick={() =>
+                      m.tab
+                        ? dispatch({ type: "SET_SECTION_AND_TAB", id: m.screen!, tab: m.tab })
+                        : dispatch({ type: "SET_SECTION", id: m.screen! })
+                    }
                   >
                     {m.source} →
                   </button>

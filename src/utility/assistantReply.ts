@@ -6,6 +6,7 @@ export interface AssistantResponse {
   text: string;
   source?: string;
   screen?: string;
+  tab?: string;
   freshness?: string;
 }
 
@@ -23,13 +24,13 @@ export function assistantReply(message: string, selectedCalendarDate: string): A
     if (!upcoming.length) {
       return {
         text: "No further events in the sample calendar after the selected date.",
-        source: "Calendar", screen: "calendar", freshness: `Demo data · ${DATA_DATE}`
+        source: "Calendar", screen: "calendar", tab: "calendar", freshness: `Demo data · ${DATA_DATE}`
       };
     }
     const lines = upcoming.map(e => `${e.title} — ${e.date} at ${e.time} (${e.category}, ${e.portfolio})`);
     return {
       text: `Next ${upcoming.length} events:\n${lines.join("\n")}`,
-      source: "Calendar", screen: "calendar", freshness: `Demo data · ${DATA_DATE}`
+      source: "Calendar", screen: "calendar", tab: "calendar", freshness: `Demo data · ${DATA_DATE}`
     };
   }
 
@@ -68,7 +69,7 @@ export function assistantReply(message: string, selectedCalendarDate: string): A
     const fundFees = fundUniverse.map(f => `${f.name}: ${f.fee}`);
     return {
       text: `Weighted average TER: ${totalCost?.[1] ?? "—"} (${totalCost?.[2] ?? ""}). Savings identified: ${savings?.[1] ?? "—"} ${savings?.[2] ?? ""}.\nFund fees — ${fundFees.join("; ")}.`,
-      source: "Fees & costs", screen: "fees", freshness: `Fee schedule as at 1 Sep · demo data`
+      source: "Fees & costs", screen: "portfolios", tab: "fees", freshness: `Fee schedule as at 1 Sep · demo data`
     };
   }
 
@@ -85,7 +86,7 @@ export function assistantReply(message: string, selectedCalendarDate: string): A
       : " All other items within limit.";
     return {
       text: `${withinMetric?.[1] ?? "—"} of ${totalMetric?.[1] ?? "—"} mandate checks within limits. Alerts: ${alertMetric?.[1] ?? "—"}.${watchText}`,
-      source: "Risk & mandates", screen: "risk", freshness: `Mandate checks as at 08:02 · demo data`
+      source: "Risk & mandates", screen: "portfolios", tab: "risk", freshness: `Mandate checks as at 08:02 · demo data`
     };
   }
 
@@ -97,7 +98,7 @@ export function assistantReply(message: string, selectedCalendarDate: string): A
     const tradesMetric = metrics.find(m => m[0] === "Proposed trades");
     return {
       text: `Unallocated cash: ${cashMetric?.[1] ?? "—"} (${cashMetric?.[2] ?? ""}). Target equity: ${targetMetric?.[1] ?? "—"} (${targetMetric?.[2] ?? ""}). Proposed trades: ${tradesMetric?.[1] ?? "—"} — ${tradesMetric?.[2] ?? ""}. No trades are placed automatically; your approval is required.`,
-      source: "Rebalance & flows", screen: "rebalance", freshness: `Proposal as at 07:20 · demo data`
+      source: "Rebalance & flows", screen: "actions", tab: "rebalance", freshness: `Proposal as at 07:20 · demo data`
     };
   }
 
@@ -116,7 +117,7 @@ export function assistantReply(message: string, selectedCalendarDate: string): A
     const lines = managerUniverse.map(m => `${m.manager} (${m.role}): ${m.assets}, ${m.rating}, ${m.review}`);
     return {
       text: lines.join("\n"),
-      source: "Managers", screen: "managers", freshness: `Demo data · ${DATA_DATE}`
+      source: "Funds", screen: "funds", freshness: `Demo data · ${DATA_DATE}`
     };
   }
 
@@ -142,7 +143,7 @@ export function assistantReply(message: string, selectedCalendarDate: string): A
     const lines = rows.map(r => `${r[0]}: AUM ${r[2]}, YTD ${r[4]}, ${r[5]}`);
     return {
       text: `${countMetric?.[1] ?? "—"} portfolios, total AUM ${aumMetric?.[1] ?? "—"} (${aumMetric?.[2] ?? ""}). ${above?.[1] ?? "—"} above benchmark on 12M.\n${lines.join("\n")}`,
-      source: "Portfolios", screen: "portfolios", freshness: `1D returns as at today · demo data`
+      source: "Portfolios", screen: "portfolios", tab: "overview", freshness: `1D returns as at today · demo data`
     };
   }
 
@@ -154,7 +155,7 @@ export function assistantReply(message: string, selectedCalendarDate: string): A
     const pack = metrics.find(m => m[0] === "Pack readiness");
     return {
       text: `Next committee: ${nextMtg?.[1] ?? "—"} at ${nextMtg?.[2] ?? ""}. Agenda items: ${agenda?.[1] ?? "—"} (${agenda?.[2] ?? ""}). Pack readiness: ${pack?.[1] ?? "—"} (${pack?.[2] ?? ""}).`,
-      source: "Committee", screen: "committee", freshness: `Demo data · ${DATA_DATE}`
+      source: "Committee", screen: "actions", tab: "committee", freshness: `Demo data · ${DATA_DATE}`
     };
   }
 
@@ -169,7 +170,7 @@ export function assistantReply(message: string, selectedCalendarDate: string): A
       : "";
     return {
       text: `${todayMetric?.[1] ?? "—"} updates today (${todayMetric?.[2] ?? ""}). ${watchMetric?.[1] ?? "—"} flagged for review.${watchText}`,
-      source: "News", screen: "news", freshness: `As of 08:02 · demo data`
+      source: "News brief", screen: "today", freshness: `As of 08:02 · demo data`
     };
   }
 
@@ -179,7 +180,7 @@ export function assistantReply(message: string, selectedCalendarDate: string): A
     const lines = recent.map(a => `${a.time}: ${a.event} (${a.status})`);
     return {
       text: `Recent audit events:\n${lines.join("\n")}`,
-      source: "Audit trail", screen: "audit", freshness: `Events as at 08:02 · demo data`
+      source: "Audit trail", screen: "control", tab: "audit", freshness: `Events as at 08:02 · demo data`
     };
   }
 
@@ -188,7 +189,7 @@ export function assistantReply(message: string, selectedCalendarDate: string): A
     const lines = noteRecords.map(n => `${n.label} — ${n.status}`);
     return {
       text: `${noteRecords.length} notes:\n${lines.join("\n")}`,
-      source: "Notes", screen: "notes", freshness: `Demo data · ${DATA_DATE}`
+      source: "Notes", screen: "calendar", tab: "notes", freshness: `Demo data · ${DATA_DATE}`
     };
   }
 
@@ -200,7 +201,7 @@ export function assistantReply(message: string, selectedCalendarDate: string): A
     const conflict = metrics.find(m => m[0] === "Needs a person");
     return {
       text: `Feeds: ${feeds?.[1] ?? "—"} (${feeds?.[2] ?? ""}). Checks: ${checks?.[1] ?? "—"} (${checks?.[2] ?? ""}). Needs attention: ${conflict?.[1] ?? "—"} — ${conflict?.[2] ?? "—"}.`,
-      source: "Data health", screen: "data-health", freshness: `Last sync 08:02 · demo data`
+      source: "Data health", screen: "control", tab: "data-health", freshness: `Last sync 08:02 · demo data`
     };
   }
 
@@ -212,7 +213,7 @@ export function assistantReply(message: string, selectedCalendarDate: string): A
     const decision = metrics.find(m => m[0] === "Needs your decision");
     return {
       text: `${active?.[1] ?? "—"} agents active (${active?.[2] ?? ""}). ${checks?.[1] ?? "—"} checks completed. ${decision?.[1] ?? "—"} items need your decision. Nothing is executed automatically.`,
-      source: "Agents", screen: "agents", freshness: `Last run 08:02 · demo data`
+      source: "Agents", screen: "control", tab: "agents", freshness: `Last run 08:02 · demo data`
     };
   }
 

@@ -61,6 +61,8 @@ export interface AppState {
   drawerOpen: boolean;
   drawerTitle: string;
   drawerDescription: string;
+  drawerFundId: string;
+  pageTab: Record<string, string>;
   toasts: string[];
 }
 
@@ -116,8 +118,10 @@ export type AppAction =
   | { type: "SET_REBALANCE_BOND_PURCHASE"; amount: number }
   | { type: "SET_REBALANCE_STAGE"; stage: string }
   | { type: "SET_REBALANCE_DECLINE_REASON"; reason: string }
+  | { type: "SET_PAGE_TAB"; page: string; tab: string }
+  | { type: "SET_SECTION_AND_TAB"; id: string; tab: string }
   | { type: "SET_ASSISTANT_OPEN"; open: boolean }
-  | { type: "OPEN_DRAWER"; title: string; description: string }
+  | { type: "OPEN_DRAWER"; title: string; description: string; fundId?: string }
   | { type: "CLOSE_DRAWER" }
   | { type: "ADD_TOAST"; message: string }
   | { type: "REMOVE_TOAST"; message: string };
@@ -181,6 +185,8 @@ const initialState: AppState = {
   drawerOpen: false,
   drawerTitle: "",
   drawerDescription: "",
+  drawerFundId: "",
+  pageTab: {},
   toasts: []
 };
 
@@ -225,19 +231,19 @@ function reducer(state: AppState, action: AppAction): AppState {
     case "TOGGLE_FUND_OUTPUT_FLAGGED": return { ...state, fundOutputFlagged: !state.fundOutputFlagged };
     case "TOGGLE_FUND_REVIEW_REQUESTED": {
       const ids = new Set(state.fundReviewRequestedIds);
-      ids.has(action.id) ? ids.delete(action.id) : ids.add(action.id);
+      if (ids.has(action.id)) ids.delete(action.id); else ids.add(action.id);
       return { ...state, fundReviewRequestedIds: ids };
     }
     case "TOGGLE_FUND_MEETING_QUESTION": {
       const ids = new Set(state.fundMeetingQuestionAddedIds);
-      ids.has(action.id) ? ids.delete(action.id) : ids.add(action.id);
+      if (ids.has(action.id)) ids.delete(action.id); else ids.add(action.id);
       return { ...state, fundMeetingQuestionAddedIds: ids };
     }
     case "TOGGLE_FUND_COMMITTEE_PAPER": return { ...state, fundCommitteePaperPrepared: !state.fundCommitteePaperPrepared };
     case "TOGGLE_FUND_CURRENT_MIX_KEPT": return { ...state, fundCurrentMixKept: !state.fundCurrentMixKept };
     case "TOGGLE_WATCHED_FUND": {
       const watched = new Set(state.watchedFunds);
-      watched.has(action.id) ? watched.delete(action.id) : watched.add(action.id);
+      if (watched.has(action.id)) watched.delete(action.id); else watched.add(action.id);
       return { ...state, watchedFunds: watched };
     }
     case "SET_MANAGER_VIEW": return { ...state, managerView: action.view, selectedManagerId: action.managerId ?? state.selectedManagerId, managerModal: "" };
@@ -289,9 +295,14 @@ function reducer(state: AppState, action: AppAction): AppState {
     case "SET_REBALANCE_BOND_PURCHASE": return { ...state, rebalanceBondPurchase: action.amount };
     case "SET_REBALANCE_STAGE": return { ...state, rebalanceStage: action.stage, rebalanceModal: "" };
     case "SET_REBALANCE_DECLINE_REASON": return { ...state, rebalanceDeclineReason: action.reason };
+    case "SET_PAGE_TAB": return { ...state, pageTab: { ...state.pageTab, [action.page]: action.tab } };
+    case "SET_SECTION_AND_TAB": {
+      const withSection = reducer(state, { type: "SET_SECTION", id: action.id });
+      return { ...withSection, pageTab: { ...withSection.pageTab, [action.id]: action.tab } };
+    }
     case "SET_ASSISTANT_OPEN": return { ...state, assistantOpen: action.open };
-    case "OPEN_DRAWER": return { ...state, drawerOpen: true, drawerTitle: action.title, drawerDescription: action.description };
-    case "CLOSE_DRAWER": return { ...state, drawerOpen: false };
+    case "OPEN_DRAWER": return { ...state, drawerOpen: true, drawerTitle: action.title, drawerDescription: action.description, drawerFundId: action.fundId ?? "" };
+    case "CLOSE_DRAWER": return { ...state, drawerOpen: false, drawerFundId: "" };
     case "ADD_TOAST": return { ...state, toasts: [...state.toasts, action.message] };
     case "REMOVE_TOAST": return { ...state, toasts: state.toasts.filter((t) => t !== action.message) };
     default: return state;

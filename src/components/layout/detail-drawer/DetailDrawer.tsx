@@ -1,4 +1,5 @@
 import { useApp } from "../../../context/AppContext";
+import FundDrawerContent from "../../funds/FundDrawerContent";
 
 export default function DetailDrawer() {
   const { state, dispatch } = useApp();
@@ -24,9 +25,10 @@ export default function DetailDrawer() {
           <button className="icon-btn drawer-close" onClick={close}>✕</button>
         </div>
         <div className="drawer-body">
-          <p className="muted" style={{ fontSize: 13 }}>
-            Detail content will appear here based on context.
-          </p>
+          {state.drawerFundId
+            ? <FundDrawerContent />
+            : <p className="muted" style={{ fontSize: 13 }}>Detail content will appear here based on context.</p>
+          }
         </div>
       </aside>
     </>

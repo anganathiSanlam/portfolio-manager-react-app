@@ -1,12 +1,6 @@
 import { newsItems, fundUniverse, pageData } from "../../data";
 import type { NewsItem } from "../../data/types";
 
-const IMPACT_LABEL: Record<NewsItem["impact"], string> = {
-  positive: "Positive",
-  neutral: "Neutral",
-  watch: "Watch",
-};
-
 function linkedLabel(item: NewsItem): string | null {
   if (item.linkedFundId) {
     const fund = fundUniverse.find(f => f.id === item.linkedFundId);

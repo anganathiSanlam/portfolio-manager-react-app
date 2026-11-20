@@ -129,3 +129,26 @@ export interface RiskProfile {
   liquidity: number;
   liquidDays: number;
 }
+
+export interface PortfolioMetrics {
+  aum: string;
+  aumDelta: string;
+  return1d: string;
+  return1dBench: string;
+  return1m: string;
+  return3m: string;
+  return1y: string;
+  ytd: string;
+  ytdBench: string;
+  equity: string;
+  openActions: string;
+}
+
+export interface ClientOutcome {
+  portfolio: string;
+  target: string;
+  targetReturn: string;
+  actualReturn: string;
+  status: "on-track" | "behind";
+  gap: string;
+}
