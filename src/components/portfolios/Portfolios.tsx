@@ -1,10 +1,12 @@
 import { useApp } from "../../context/AppContext";
-import { portfolios, portfolioMetrics } from "../../data";
+import { portfolios, portfolioMetrics, portfolioChartData } from "../../data";
 import Tabs from "../common/tabs/Tabs";
 import { useActiveTab } from "../common/tabs/useActiveTab";
 import Risk from "../risk/Risk";
 import Fees from "../fees/Fees";
 import ClientOutcomes from "./ClientOutcomes";
+import LineChart from "../common/charts/LineChart";
+import DonutChart from "../common/charts/DonutChart";
 
 const TABS = [
   { id: "overview",  label: "Overview" },
@@ -13,20 +15,19 @@ const TABS = [
   { id: "outcomes",  label: "Client outcomes" },
 ];
 
-const ALLOC_COLORS = ["#8bc7ac", "#e7c47c", "#7ab8e8", "#df747c", "#a89de6"];
-
 const ALLOC = [
-  { label: "Local equity",  pct: 32 },
-  { label: "Global equity", pct: 22 },
-  { label: "Local bonds",   pct: 25 },
-  { label: "Global bonds",  pct: 10 },
-  { label: "Cash",          pct: 11 },
+  { label: "Local equity",  pct: 32, color: "#8bc7ac" },
+  { label: "Global equity", pct: 22, color: "#e7c47c" },
+  { label: "Local bonds",   pct: 25, color: "#7ab8e8" },
+  { label: "Global bonds",  pct: 10, color: "#df747c" },
+  { label: "Cash",          pct: 11, color: "#a89de6" },
 ];
 
 export default function Portfolios() {
   const { state, dispatch } = useApp();
   const tab = useActiveTab("portfolios", "overview");
   const m = portfolioMetrics[state.portfolio];
+  const chart = portfolioChartData[state.portfolio];
 
   return (
     <div>
@@ -67,6 +68,26 @@ export default function Portfolios() {
             </div>
           </div>
 
+          {/* Line chart */}
+          {chart && (
+            <div className="card" style={{ marginBottom: 20 }}>
+              <div className="card-header">
+                <span className="card-title">12-month performance</span>
+                <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+                  <span style={{ fontSize: 11, color: "var(--green)", display: "flex", alignItems: "center", gap: 4 }}>
+                    <span style={{ display: "inline-block", width: 16, height: 2, background: "var(--green)", borderRadius: 1 }} />
+                    Portfolio
+                  </span>
+                  <span style={{ fontSize: 11, color: "var(--muted)", display: "flex", alignItems: "center", gap: 4 }}>
+                    <span style={{ display: "inline-block", width: 16, height: 2, background: "#4a5568", borderRadius: 1 }} />
+                    Benchmark
+                  </span>
+                </div>
+              </div>
+              <LineChart portfolio={chart.portfolio} benchmark={chart.benchmark} months={chart.months} />
+            </div>
+          )}
+
           <div className="portfolio-cards">
             {portfolios.map((p) => (
               <div
@@ -85,28 +106,26 @@ export default function Portfolios() {
             ))}
           </div>
 
+          {/* Donut chart for allocation */}
           <div className="portfolio-detail card" style={{ marginTop: 20 }}>
             <div className="card-header">
               <span className="card-title">Asset allocation — {state.portfolio}</span>
             </div>
-            <div className="allocation-bar-wrap">
-              <div className="allocation-bar">
-                {ALLOC.map((seg, i) => (
-                  <div
-                    key={seg.label}
-                    className="allocation-bar-seg"
-                    style={{ width: `${seg.pct}%`, background: ALLOC_COLORS[i] }}
-                  />
+            <div className="allocation-donut-wrap">
+              <DonutChart
+                segments={ALLOC}
+                centerLabel={m.equity}
+                centerSub="equity"
+                size={150}
+              />
+              <div className="allocation-legend">
+                {ALLOC.map((seg) => (
+                  <div key={seg.label} className="allocation-legend-item">
+                    <span className="allocation-dot" style={{ background: seg.color }} />
+                    {seg.label} {seg.pct}%
+                  </div>
                 ))}
               </div>
-            </div>
-            <div className="allocation-legend">
-              {ALLOC.map((seg, i) => (
-                <div key={seg.label} className="allocation-legend-item">
-                  <span className="allocation-dot" style={{ background: ALLOC_COLORS[i] }} />
-                  {seg.label} {seg.pct}%
-                </div>
-              ))}
             </div>
           </div>
         </>

@@ -20,22 +20,22 @@ export default function ActionsPage() {
   return (
     <div>
       <div className="pipeline-header">
-        <div className="pipeline-stage">
-          <span className="pipeline-stage-count active">{proposed}</span>
+        <div className="pipeline-stage pipeline-stage-proposed">
+          <span className="pipeline-stage-count">{proposed}</span>
           <span className="pipeline-stage-label">Proposed</span>
         </div>
         <span className="pipeline-arrow">›</span>
-        <div className="pipeline-stage">
+        <div className="pipeline-stage pipeline-stage-checked">
           <span className="pipeline-stage-count">{checked}</span>
           <span className="pipeline-stage-label">Checked</span>
         </div>
         <span className="pipeline-arrow">›</span>
-        <div className="pipeline-stage">
+        <div className="pipeline-stage pipeline-stage-approved">
           <span className="pipeline-stage-count">{approved}</span>
           <span className="pipeline-stage-label">Approved</span>
         </div>
         <span className="pipeline-arrow">›</span>
-        <div className="pipeline-stage">
+        <div className="pipeline-stage pipeline-stage-done">
           <span className="pipeline-stage-count">{done}</span>
           <span className="pipeline-stage-label">Done</span>
         </div>

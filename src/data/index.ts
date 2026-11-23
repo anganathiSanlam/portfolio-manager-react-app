@@ -320,3 +320,30 @@ export const clientOutcomes: ClientOutcome[] = [
   { portfolio: "Conservative portfolio", target: "Inflation + 2% · 3-year horizon", targetReturn: "9.2%",  actualReturn: "8.1%",  status: "behind",   gap: "−1.1pp" },
   { portfolio: "Aggressive portfolio",   target: "Inflation + 7% · 7-year horizon", targetReturn: "14.2%", actualReturn: "15.1%", status: "on-track",  gap: "+0.9pp" },
 ];
+
+const MONTHS = ["Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov"];
+
+export const portfolioChartData: Record<string, { portfolio: number[]; benchmark: number[]; months: string[] }> = {
+  "Moderate portfolio": {
+    portfolio:  [100, 100.8, 101.4, 102.3, 101.9, 103.1, 104.2, 105.1, 105.8, 106.5, 107.3, 108.4],
+    benchmark:  [100, 100.6, 101.1, 102.0, 101.6, 102.7, 103.8, 104.5, 105.1, 105.8, 106.5, 107.9],
+    months: MONTHS,
+  },
+  "Conservative portfolio": {
+    portfolio:  [100, 100.5, 100.9, 101.5, 101.3, 102.0, 102.7, 103.2, 103.7, 104.3, 105.0, 106.1],
+    benchmark:  [100, 100.4, 100.8, 101.4, 101.2, 101.8, 102.5, 103.0, 103.4, 104.0, 104.7, 105.8],
+    months: MONTHS,
+  },
+  "Aggressive portfolio": {
+    portfolio:  [100, 101.2, 102.1, 103.4, 102.5, 104.3, 106.1, 107.5, 108.4, 109.2, 110.1, 111.1],
+    benchmark:  [100, 101.0, 101.8, 103.0, 102.1, 103.8, 105.4, 106.7, 107.5, 108.2, 109.1, 110.2],
+    months: MONTHS,
+  },
+};
+
+export const fundSparklines: Record<string, number[]> = {
+  "northstar": [-0.1,  0.2,  0.3, -0.2,  0.4,  0.3,  0.1],
+  "umzi":      [ 0.1,  0.0,  0.2,  0.1, -0.1,  0.1,  0.2],
+  "protea":    [ 0.3,  0.4,  0.2,  0.5,  0.3,  0.4,  0.3],
+  "cedar":     [ 0.1,  0.0,  0.1, -0.1,  0.0,  0.1,  0.1],
+};

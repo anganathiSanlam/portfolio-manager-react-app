@@ -1,5 +1,6 @@
 import { useApp } from "../../context/AppContext";
-import { calendarEvents, portfolioMetrics, newsItems } from "../../data";
+import { calendarEvents, portfolioMetrics, newsItems, portfolioChartData } from "../../data";
+import LineChart from "../common/charts/LineChart";
 
 const AGENT_ACTIVITY = [
   { label: "Rebalance proposal generated", time: "08:14", detail: "Equity drift +3.2pp detected — review ready" },
@@ -13,15 +14,24 @@ const IMPACT_COLOR: Record<string, string> = {
   neutral: "var(--muted)",
 };
 
+const CATEGORY_ICON: Record<string, string> = {
+  Market: "📈", Macro: "🌍", Manager: "🏢", Portfolio: "📂",
+};
+
 export default function Today() {
   const { state } = useApp();
   const m = portfolioMetrics[state.portfolio];
+  const chart = portfolioChartData[state.portfolio];
 
   const todayEvents = calendarEvents
     .filter((e) => e.portfolio === state.portfolio || e.portfolio === "all")
     .slice(0, 4);
 
   const topNews = newsItems.slice(0, 2);
+
+  const ytdNum = parseFloat(m.ytd);
+  const ytdBenchNum = parseFloat(m.ytdBench.replace("Bench ", ""));
+  const maxYtd = Math.max(ytdNum, ytdBenchNum, 1);
 
   return (
     <div>
@@ -35,28 +45,48 @@ export default function Today() {
         </div>
       </div>
 
-      <div className="metric-grid">
-        <div className="metric-card">
-          <div className="metric-label">AUM</div>
-          <div className="metric-value">{m.aum}</div>
-          <div className="metric-delta">{m.aumDelta}</div>
+      {/* Hero AUM + returns */}
+      <div className="today-hero">
+        <div className="today-hero-aum">
+          <div className="today-hero-aum-value">{m.aum}</div>
+          <div className="today-hero-aum-delta">{m.aumDelta}</div>
         </div>
-        <div className="metric-card">
-          <div className="metric-label">YTD return</div>
-          <div className="metric-value">{m.ytd}</div>
-          <div className="metric-delta">{m.ytdBench}</div>
-        </div>
-        <div className="metric-card">
-          <div className="metric-label">Today</div>
-          <div className="metric-value">{m.return1d}</div>
-          <div className="metric-delta">{m.return1dBench}</div>
-        </div>
-        <div className="metric-card">
-          <div className="metric-label">Open actions</div>
-          <div className="metric-value">{m.openActions}</div>
-          <div className="metric-delta">Pending review</div>
+        <div className="today-hero-returns">
+          <div className="today-return-row">
+            <span className="today-return-row-label">YTD</span>
+            <div className="today-return-row-track">
+              <div className="today-return-row-fill portfolio" style={{ width: `${(ytdNum / maxYtd) * 100}%` }} />
+            </div>
+            <span className="today-return-row-value green">{m.ytd}</span>
+          </div>
+          <div className="today-return-row">
+            <span className="today-return-row-label">Bench</span>
+            <div className="today-return-row-track">
+              <div className="today-return-row-fill bench" style={{ width: `${(ytdBenchNum / maxYtd) * 100}%` }} />
+            </div>
+            <span className="today-return-row-value muted">{m.ytdBench.replace("Bench ", "")}</span>
+          </div>
+          <div className="today-hero-mini-stats">
+            <span>Today <strong className="green">{m.return1d}</strong></span>
+            <span>1m <strong>{m.return1m}</strong></span>
+            <span>Open actions <strong>{m.openActions}</strong></span>
+          </div>
         </div>
       </div>
+
+      {/* Line chart */}
+      {chart && (
+        <div className="card today-chart-card">
+          <div className="card-header">
+            <span className="card-title">12-month performance</span>
+            <div className="today-chart-legend">
+              <span className="today-legend-item portfolio">Portfolio</span>
+              <span className="today-legend-item bench">Benchmark</span>
+            </div>
+          </div>
+          <LineChart portfolio={chart.portfolio} benchmark={chart.benchmark} months={chart.months} />
+        </div>
+      )}
 
       <div className="today-grid">
         <div className="card">
@@ -87,7 +117,9 @@ export default function Today() {
           <div className="events-list">
             {topNews.map((n) => (
               <div key={n.id} className="event-item">
-                <div className="event-time" style={{ color: IMPACT_COLOR[n.impact] }}>{n.category}</div>
+                <div className="event-time" style={{ color: IMPACT_COLOR[n.impact] }}>
+                  {CATEGORY_ICON[n.category]} {n.category}
+                </div>
                 <div>
                   <div className="event-title">{n.headline}</div>
                   <div className="event-sub">{n.time}</div>

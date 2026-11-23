@@ -1,6 +1,7 @@
 import { useApp } from "../../context/AppContext";
 import { pageData } from "../../data";
 import { formatPercent } from "../../utility/formatters";
+import ArcGauge from "../common/charts/ArcGauge";
 
 const SCENARIOS = [
   { id: "base", label: "Base case", shock: 0 },
@@ -82,17 +83,22 @@ export default function Risk() {
       </div>
 
       <div className="card" style={{ marginTop: 20 }}>
-        <div className="card-header"><span className="card-title">Mandate checks</span></div>
-        <div className="breach-list">
-          {(data.rows ?? []).map((row, i) => (
-            <div key={i} className={`breach-item${row[2] === "Pass" ? "" : " warning"}`}>
-              <div>
-                <div style={{ fontWeight: 600 }}>{row[0]}</div>
-                <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>{row[1]}</div>
-              </div>
-              <span className={`tag ${row[2] === "Pass" ? "tag-green" : "tag-amber"}`} style={{ marginLeft: "auto" }}>{row[2]}</span>
-            </div>
-          ))}
+        <div className="card-header"><span className="card-title">Mandate utilisation</span></div>
+        <div className="mandate-gauge-grid">
+          {(data.rows ?? []).map((row, i) => {
+            const current = parseFloat(row[2]);
+            const limit   = parseFloat(row[3]);
+            return (
+              <ArcGauge
+                key={i}
+                current={current}
+                limit={limit}
+                label={row[1]}
+                portfolio={row[0]}
+                size={96}
+              />
+            );
+          })}
         </div>
       </div>
     </div>

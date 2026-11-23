@@ -1,6 +1,10 @@
 import { newsItems, fundUniverse, pageData } from "../../data";
 import type { NewsItem } from "../../data/types";
 
+const CATEGORY_ICON: Record<string, string> = {
+  Market: "📈", Macro: "🌍", Manager: "🏢", Portfolio: "📂",
+};
+
 function linkedLabel(item: NewsItem): string | null {
   if (item.linkedFundId) {
     const fund = fundUniverse.find(f => f.id === item.linkedFundId);
@@ -12,7 +16,6 @@ function linkedLabel(item: NewsItem): string | null {
 
 export default function News() {
   const data = pageData.news;
-  const watchItems = newsItems.filter(n => n.impact === "watch");
 
   return (
     <div className="news-page">
@@ -32,32 +35,27 @@ export default function News() {
         </div>
       )}
 
-      {watchItems.length > 0 && (
-        <div className="why-panel news-watch-panel">
-          <div className="why-panel-label">Watch</div>
-          <strong>{watchItems[0].headline}</strong>
-          <p style={{ margin: "6px 0 0" }}>{watchItems[0].summary}</p>
-        </div>
-      )}
-
       <div className="news-feed-label">Recent updates</div>
       <div className="news-feed">
         {newsItems.map(item => {
           const link = linkedLabel(item);
           return (
             <div key={item.id} className={`news-card news-impact-${item.impact}`}>
-              <div className="news-card-dot" aria-hidden />
+              <div className="news-card-header">
+                <span className="news-card-category">
+                  <span className="news-card-icon">{CATEGORY_ICON[item.category]}</span>
+                  {item.category}
+                </span>
+                <span className="news-card-time-stamp">{item.time} · {item.date}</span>
+              </div>
               <div className="news-card-body">
                 <div className="news-card-headline">{item.headline}</div>
                 <div className="news-card-summary">{item.summary}</div>
-                <div className="news-card-tags">
-                  <span className={`news-tag news-tag-category`}>{item.category}</span>
-                  {link && <span className="news-tag news-tag-link">{link}</span>}
-                </div>
-              </div>
-              <div className="news-card-date">
-                <span>{item.date}</span>
-                <span className="news-card-time">{item.time}</span>
+                {link && (
+                  <div className="news-card-footer">
+                    <span className="news-tag news-tag-link">{link}</span>
+                  </div>
+                )}
               </div>
             </div>
           );

@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useApp } from "../../context/AppContext";
-import { fundUniverse, pageData } from "../../data";
+import { fundUniverse, pageData, fundSparklines } from "../../data";
+import Sparkline from "../common/charts/Sparkline";
+
+const DEFAULT_SPARKLINE = [0.1, -0.05, 0.1, 0.0, 0.1, -0.05, 0.1];
 
 export default function Funds() {
   const { state, dispatch } = useApp();
@@ -64,6 +67,7 @@ export default function Funds() {
               <th>Role</th>
               <th className="num">Weight</th>
               <th className="num">Excess</th>
+              <th>7-day trend</th>
               <th className="num">Fee</th>
               <th>Rating</th>
               <th>Review</th>
@@ -84,6 +88,9 @@ export default function Funds() {
                 <td className="num">{f.weight}</td>
                 <td className={`num ${parseFloat(f.excessValue.toString()) >= 0 ? "green" : "red"}`}>
                   {f.excess}
+                </td>
+                <td style={{ paddingTop: 6, paddingBottom: 6 }}>
+                  <Sparkline values={fundSparklines[f.id] ?? DEFAULT_SPARKLINE} />
                 </td>
                 <td className="num">{f.fee}</td>
                 <td>

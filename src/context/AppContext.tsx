@@ -58,6 +58,7 @@ export interface AppState {
   rebalanceStage: string;
   rebalanceDeclineReason: string;
   assistantOpen: boolean;
+  auditPanelOpen: boolean;
   drawerOpen: boolean;
   drawerTitle: string;
   drawerDescription: string;
@@ -121,6 +122,7 @@ export type AppAction =
   | { type: "SET_PAGE_TAB"; page: string; tab: string }
   | { type: "SET_SECTION_AND_TAB"; id: string; tab: string }
   | { type: "SET_ASSISTANT_OPEN"; open: boolean }
+  | { type: "SET_AUDIT_PANEL_OPEN"; open: boolean }
   | { type: "OPEN_DRAWER"; title: string; description: string; fundId?: string }
   | { type: "CLOSE_DRAWER" }
   | { type: "ADD_TOAST"; message: string }
@@ -182,6 +184,7 @@ const initialState: AppState = {
   rebalanceStage: "proposed",
   rebalanceDeclineReason: "",
   assistantOpen: false,
+  auditPanelOpen: false,
   drawerOpen: false,
   drawerTitle: "",
   drawerDescription: "",
@@ -301,6 +304,7 @@ function reducer(state: AppState, action: AppAction): AppState {
       return { ...withSection, pageTab: { ...withSection.pageTab, [action.id]: action.tab } };
     }
     case "SET_ASSISTANT_OPEN": return { ...state, assistantOpen: action.open };
+    case "SET_AUDIT_PANEL_OPEN": return { ...state, auditPanelOpen: action.open };
     case "OPEN_DRAWER": return { ...state, drawerOpen: true, drawerTitle: action.title, drawerDescription: action.description, drawerFundId: action.fundId ?? "" };
     case "CLOSE_DRAWER": return { ...state, drawerOpen: false, drawerFundId: "" };
     case "ADD_TOAST": return { ...state, toasts: [...state.toasts, action.message] };

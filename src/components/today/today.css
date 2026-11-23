@@ -1,3 +1,87 @@
+/* ---- Hero metrics ---- */
+.today-hero {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 20px 24px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.today-hero-aum-value {
+  font-size: 36px;
+  font-weight: 730;
+  letter-spacing: -1.5px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.today-hero-aum-delta {
+  font-size: 12px;
+  color: var(--green);
+  margin-top: 5px;
+}
+
+.today-return-row {
+  display: grid;
+  grid-template-columns: 50px 1fr 56px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 7px;
+}
+.today-return-row-label { font-size: 11px; color: var(--muted); }
+.today-return-row-track {
+  height: 6px;
+  background: var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.today-return-row-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .4s ease;
+}
+.today-return-row-fill.portfolio { background: var(--green); }
+.today-return-row-fill.bench     { background: #4a5568; }
+.today-return-row-value { font-size: 12px; font-weight: 630; font-variant-numeric: tabular-nums; text-align: right; }
+.today-return-row-value.green { color: var(--green); }
+.today-return-row-value.muted { color: var(--muted); }
+
+.today-hero-mini-stats {
+  display: flex;
+  gap: 18px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.today-hero-mini-stats strong { color: var(--text); font-weight: 630; }
+.today-hero-mini-stats strong.green { color: var(--green); }
+
+/* ---- Chart card ---- */
+.today-chart-card { margin-bottom: 20px; }
+.today-chart-legend { display: flex; gap: 14px; align-items: center; }
+.today-legend-item {
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.today-legend-item::before {
+  content: "";
+  display: inline-block;
+  width: 20px;
+  height: 2px;
+  border-radius: 1px;
+}
+.today-legend-item.portfolio { color: var(--green); }
+.today-legend-item.portfolio::before { background: var(--green); }
+.today-legend-item.bench::before { background: #4a5568; }
+
+/* ---- Main grid ---- */
 .today-grid {
   display: grid;
   gap: 20px;
