@@ -134,12 +134,67 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 /* ============================================================
    PAGE TABS — shared accessible tab bar
    ============================================================ */
+.tabs-wrapper { display: flex; flex-direction: column; }
+
 .page-tabs {
   display: flex;
   gap: 0;
-  margin-bottom: 24px;
   border-bottom: 2px solid var(--border);
   padding: 0;
+}
+
+/* ── LINEAR FLOW NAV ── */
+.flow-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 2px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.flow-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .12s, color .12s, border-color .12s;
+  white-space: nowrap;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.flow-nav-btn:hover:not(:disabled) {
+  background: var(--brand-primary);
+  color: #fff;
+  border-color: var(--brand-primary);
+}
+.flow-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.flow-nav-btn-next {
+  flex-direction: row-reverse;
+  color: var(--brand-primary);
+  border-color: var(--brand-primary);
+  font-weight: 600;
+}
+.flow-nav-btn-next:not(:disabled) { background: var(--brand-accent-soft); }
+.flow-nav-btn-next:hover:not(:disabled) { background: var(--brand-primary); color: #fff; }
+.flow-nav-label { overflow: hidden; text-overflow: ellipsis; }
+.flow-nav-step {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
 }
 
 .page-tab {

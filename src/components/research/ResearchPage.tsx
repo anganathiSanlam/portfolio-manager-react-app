@@ -159,6 +159,72 @@ function ScoreBar({ value }: { value: number }) {
 
 /* ─── MANAGER PROFILE ────────────────────────────────────── */
 
+type Rating = "A" | "AA" | "AAA";
+
+interface RatingEntry {
+  rating: Rating;
+  label: string;
+  description: string;
+}
+
+interface ESGEntry {
+  rating: Rating;
+  label: string;
+  e: Rating; s: Rating; g: Rating;
+  note: string;
+}
+
+interface FundRatings {
+  risk: RatingEntry;
+  skill: RatingEntry;
+  esg?: ESGEntry;
+}
+
+const FUND_RATINGS: Record<string, FundRatings> = {
+  northstar: {
+    risk: {
+      rating: "AAA",
+      label: "High",
+      description: "Concentrated global large-cap equity with elevated US mega-cap exposure (38%). Currency risk unhedged. Style drift toward growth increases sensitivity to rate moves.",
+    },
+    skill: {
+      rating: "AA",
+      label: "Strong",
+      description: "Consistent top-quartile record over 5+ years. Disciplined sell discipline and low turnover indicate genuine stock-selection edge. Under active review following 2024 drift.",
+    },
+    esg: {
+      rating: "AA",
+      label: "ESG Integrated",
+      e: "AAA", s: "AA", g: "AAA",
+      note: "ESG fully integrated into stock selection. Proprietary scoring framework. Excludes thermal coal and controversial weapons. Annual engagement report published.",
+    },
+  },
+  umzi: {
+    risk: {
+      rating: "A",
+      label: "Low",
+      description: "Investment-grade SA government and high-grade bonds. Duration 6.2y vs 5.4y benchmark — above-average interest-rate sensitivity but credit quality remains high.",
+    },
+    skill: {
+      rating: "AA",
+      label: "Strong",
+      description: "Macro-driven duration calls have added consistent value through the cutting cycle. Monthly IC sign-off and transparent process. Highest consistency score in the SA bond peer group.",
+    },
+  },
+  protea: {
+    risk: {
+      rating: "AA",
+      label: "Moderate",
+      description: "SA equity mandate with value bias. Concentration in financials (28%) adds sector risk. Domestic exposure means sensitivity to rand and macro cycle.",
+    },
+    skill: {
+      rating: "A",
+      label: "Adequate",
+      description: "Recent outperformance (+1.2pp) validates value approach. Shorter track record for lead PM (9 years) vs peers. Research lead confirmed Oct 2024 adds depth.",
+    },
+  },
+};
+
 const FUND_QUAL: Record<string, {
   philosophy: string;
   team: string;
@@ -201,16 +267,141 @@ const FUND_QUAL: Record<string, {
   },
 };
 
+const RATING_LEVELS: Rating[] = ["A", "AA", "AAA"];
+
+function RatingBadge({ rating, color }: { rating: Rating; color: string }) {
+  const filled = RATING_LEVELS.indexOf(rating) + 1;
+  return (
+    <div className="rating-segments">
+      {RATING_LEVELS.map((lvl, i) => (
+        <span
+          key={lvl}
+          className={`rating-segment${i < filled ? " filled" : ""}`}
+          style={i < filled ? { background: color } : {}}
+        >
+          {lvl}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function riskColor(r: Rating) {
+  return r === "AAA" ? "var(--negative)" : r === "AA" ? "var(--warning)" : "var(--positive)";
+}
+function skillColor(r: Rating) {
+  return r === "AAA" ? "var(--positive)" : r === "AA" ? "var(--brand-accent)" : "var(--warning)";
+}
+function esgColor(r: Rating) {
+  return r === "AAA" ? "var(--positive)" : r === "AA" ? "var(--brand-accent)" : "var(--text-muted)";
+}
+
+function RatingsTab({ selectedId }: { selectedId: string }) {
+  const ratings = FUND_RATINGS[selectedId];
+  if (!ratings) return <div className="prepare-placeholder">No ratings available for this fund.</div>;
+
+  const rc = riskColor(ratings.risk.rating);
+  const sc = skillColor(ratings.skill.rating);
+
+  return (
+    <div className="ratings-layout">
+      {/* Risk rating */}
+      <div className="card rating-card">
+        <div className="rating-card-header">
+          <div>
+            <div className="rating-type-label">Risk Rating</div>
+            <div className="rating-label" style={{ color: rc }}>{ratings.risk.label}</div>
+          </div>
+          <div className="rating-score-block">
+            <RatingBadge rating={ratings.risk.rating} color={rc} />
+            <div className="rating-score-num" style={{ color: rc }}>{ratings.risk.rating}</div>
+          </div>
+        </div>
+        <p className="rating-desc">{ratings.risk.description}</p>
+        <div className="rating-scale-legend">
+          <span style={{ color: "var(--positive)" }}>A Low</span>
+          <span className="rating-scale-sep">→</span>
+          <span style={{ color: "var(--warning)" }}>AA Moderate</span>
+          <span className="rating-scale-sep">→</span>
+          <span style={{ color: "var(--negative)" }}>AAA High</span>
+        </div>
+      </div>
+
+      {/* Skill rating */}
+      <div className="card rating-card">
+        <div className="rating-card-header">
+          <div>
+            <div className="rating-type-label">Skill Rating</div>
+            <div className="rating-label" style={{ color: sc }}>{ratings.skill.label}</div>
+          </div>
+          <div className="rating-score-block">
+            <RatingBadge rating={ratings.skill.rating} color={sc} />
+            <div className="rating-score-num" style={{ color: sc }}>{ratings.skill.rating}</div>
+          </div>
+        </div>
+        <p className="rating-desc">{ratings.skill.description}</p>
+        <div className="rating-scale-legend">
+          <span style={{ color: "var(--warning)" }}>A Adequate</span>
+          <span className="rating-scale-sep">→</span>
+          <span style={{ color: "var(--brand-accent)" }}>AA Strong</span>
+          <span className="rating-scale-sep">→</span>
+          <span style={{ color: "var(--positive)" }}>AAA Exceptional</span>
+        </div>
+      </div>
+
+      {/* ESG rating — only if present */}
+      {ratings.esg && (
+        <div className="card rating-card rating-card-esg">
+          <div className="rating-card-header">
+            <div>
+              <div className="rating-type-label">ESG Rating</div>
+              <div className="rating-label" style={{ color: esgColor(ratings.esg.rating) }}>{ratings.esg.label}</div>
+            </div>
+            <div className="rating-score-block">
+              <RatingBadge rating={ratings.esg.rating} color={esgColor(ratings.esg.rating)} />
+              <div className="rating-score-num" style={{ color: esgColor(ratings.esg.rating) }}>{ratings.esg.rating}</div>
+            </div>
+          </div>
+          <div className="esg-pillars">
+            {([["E", ratings.esg.e, "Environmental"], ["S", ratings.esg.s, "Social"], ["G", ratings.esg.g, "Governance"]] as const).map(([, val, fullLabel]) => (
+              <div key={fullLabel} className="esg-pillar">
+                <div className="esg-pillar-label">{fullLabel}</div>
+                <RatingBadge rating={val} color={esgColor(val)} />
+                <div className="esg-pillar-score" style={{ color: esgColor(val) }}>{val}</div>
+              </div>
+            ))}
+          </div>
+          <p className="rating-desc" style={{ marginTop: 12 }}>{ratings.esg.note}</p>
+        </div>
+      )}
+
+      {!ratings.esg && (
+        <div className="card rating-card rating-card-esg-na">
+          <div className="rating-type-label">ESG Rating</div>
+          <div className="rating-esg-na">Not assessed — ESG rating not available for this fund.</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ManagerProfileTab({ perf }: { perf: PerformanceData | null; ab: AlphaBetaData | null }) {
   const { dispatch } = useApp();
   const funds = fundUniverse;
   const [selectedId, setSelectedId] = useState("northstar");
+  const [profileTab, setProfileTab] = useState<"overview" | "ratings">("overview");
   const fund = funds.find(f => f.id === selectedId);
   const fundPerf = perf?.funds[selectedId];
   const qual = FUND_QUAL[selectedId];
 
   return (
     <div className="profile-layout">
+      {/* Inner sub-tabs */}
+      <div className="profile-inner-tabs">
+        <button className={`profile-inner-tab${profileTab === "overview" ? " active" : ""}`} onClick={() => setProfileTab("overview")}>Overview</button>
+        <button className={`profile-inner-tab${profileTab === "ratings" ? " active" : ""}`} onClick={() => setProfileTab("ratings")}>Ratings</button>
+      </div>
+
       {/* Fund selector */}
       <div className="profile-selector">
         {funds.map(f => (
@@ -224,7 +415,11 @@ function ManagerProfileTab({ perf }: { perf: PerformanceData | null; ab: AlphaBe
         ))}
       </div>
 
-      {fund && fundPerf && qual && (
+      {/* Ratings tab */}
+      {profileTab === "ratings" && <RatingsTab selectedId={selectedId} />}
+
+      {/* Overview tab */}
+      {profileTab === "overview" && fund && fundPerf && qual && (
         <div className="profile-body">
           {/* Left: quantitative */}
           <div className="profile-quant">
@@ -328,7 +523,7 @@ function ManagerProfileTab({ perf }: { perf: PerformanceData | null; ab: AlphaBe
               <p className="profile-qual-text">{qual.whyWeHold}</p>
               <div className="profile-hv-link">
                 <span className="profile-hv-icon">↗</span>
-                <button className="profile-hv-btn" onClick={() => dispatch({ type: "SET_SECTION_AND_TAB", id: "prepare", tab: "houseview" })}>
+                <button className="profile-hv-btn" onClick={() => dispatch({ type: "SET_SECTION_AND_TAB", id: "prepare", tab: "taa" })}>
                   {qual.houseViewLink}
                 </button>
               </div>

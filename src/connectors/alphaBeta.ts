@@ -26,6 +26,14 @@ export interface HouseViewRow {
   sourceRefs: string[];
 }
 
+export interface TAARatingRow {
+  assetClass: string;
+  current:   -2 | -1 | 0 | 1 | 2;
+  shortTerm: -2 | -1 | 0 | 1 | 2;   // 0–6 month view
+  longTerm:  -2 | -1 | 0 | 1 | 2;   // 6–12 month view
+  changeNote?: string;
+}
+
 export interface TAARow {
   assetClass: string;
   currentMin: number;      // current positioning, -2 to +2
@@ -39,6 +47,8 @@ export interface AlphaBetaData {
   funds: FundScreenRow[];
   houseView: HouseViewRow[];
   taaPositioning: TAARow[];
+  saTAA: TAARatingRow[];
+  globalTAA: TAARatingRow[];
   _meta: ConnectorMeta;
 }
 
@@ -70,6 +80,23 @@ export async function getAlphaBetaData(): Promise<AlphaBetaData> {
       { assetClass: "SA Property", expectedReturn: 8.4, hurdleRate: 10.0, view: -1, reason: "Structural vacancy headwinds in office and retail.", macro: "Rate cuts help valuations but income growth muted.", allocationChange: "Neutral to slight underweight", sourceRefs: ["AlphaBeta", "Trade ZA"] },
       { assetClass: "Infrastructure", expectedReturn: 11.2, hurdleRate: 10.0, view: 1, reason: "Inflation-linked cash flows; electricity build-out theme.", macro: "Long-dated real rates falling — favours infrastructure duration.", allocationChange: "+1pp overweight", sourceRefs: ["Trading Economics — SA bond", "AlphaBeta"] },
       { assetClass: "Cash", expectedReturn: 7.9, hurdleRate: 7.75, view: 0, reason: "Attractive short-term but repo heading lower — trim over 12m.", macro: "SA repo 7.75% — real return positive but expected to decline.", allocationChange: "Neutral — trim on rate cuts", sourceRefs: ["Trading Economics — SA repo"] },
+    ],
+    saTAA: [
+      { assetClass: "SA Equity",        current:  1, shortTerm:  1, longTerm:  2, changeNote: "↑ Upgraded from neutral last month" },
+      { assetClass: "SA Bonds",         current:  2, shortTerm:  2, longTerm:  1, changeNote: "— Maintained +2" },
+      { assetClass: "SA ILBs",          current:  0, shortTerm:  0, longTerm:  1 },
+      { assetClass: "SA Property",      current: -1, shortTerm: -1, longTerm:  0 },
+      { assetClass: "SA Cash",          current:  0, shortTerm: -1, longTerm: -1, changeNote: "↓ 6–12m view cut on rate path" },
+      { assetClass: "SA Infrastructure",current:  1, shortTerm:  1, longTerm:  1 },
+    ],
+    globalTAA: [
+      { assetClass: "DM Equity",             current: -1, shortTerm: -1, longTerm:  0, changeNote: "— Maintained underweight" },
+      { assetClass: "EM Equity",             current:  0, shortTerm:  0, longTerm:  1 },
+      { assetClass: "Global Bonds",          current: -1, shortTerm: -2, longTerm: -1, changeNote: "↓ Short-term cut to -2" },
+      { assetClass: "Global ILB",            current:  0, shortTerm:  0, longTerm:  0 },
+      { assetClass: "Global Infrastructure", current:  1, shortTerm:  1, longTerm:  1 },
+      { assetClass: "Global Property",       current: -1, shortTerm: -1, longTerm:  0 },
+      { assetClass: "Global Cash",           current:  0, shortTerm:  0, longTerm:  0 },
     ],
     taaPositioning: [
       { assetClass: "DM Equity",             currentMin: -1.0, currentMax:  0.0, forwardView: -0.5, historicalReturns: { "2018": -6.5,  "2019": 24.8, "2020": 15.1, "2021": 20.4, "2022": -18.2, "2023": 23.1, "2024": 21.5, "2025": 12.3 }, oneYearReturn: 15.8 },
