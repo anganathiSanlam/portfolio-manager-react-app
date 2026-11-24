@@ -6,11 +6,11 @@ export default function Sidebar() {
 
   return (
     <nav className="sidebar">
-      <button className="brand" onClick={() => dispatch({ type: "SET_SECTION", id: "today" })}>
-        <span className="brand-mark">P</span>
-        PET
+      <button className="brand" onClick={() => dispatch({ type: "SET_SECTION", id: "prepare" })}>
+        <span className="brand-mark">PM</span>
+        PM Insight
       </button>
-      <span className="brand-caption">PORTFOLIO EXECUTION TOOL</span>
+      <span className="brand-caption">SANLAM MULTI-MANAGER</span>
 
       <span className="nav-caption">NAVIGATION</span>
       <div className="main-nav">

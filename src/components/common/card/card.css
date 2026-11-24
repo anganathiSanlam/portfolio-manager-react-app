@@ -1,8 +1,9 @@
 .card {
   padding: 20px 22px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: var(--panel);
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
 }
 
 .card-header {
@@ -23,11 +24,11 @@
 .card-subtitle {
   margin-top: 2px;
   font-size: 11px;
-  color: var(--muted);
+  color: var(--text-muted);
 }
 
 .card + .card { margin-top: 12px; }
 
-.card.clickable { cursor: pointer; transition: background .15s, border-color .15s; }
-.card.clickable:hover { background: var(--panel-hover); border-color: #3a4652; }
-.card.selected { border-color: var(--green); }
+.card.clickable { cursor: pointer; transition: background .15s, border-color .15s, box-shadow .15s; }
+.card.clickable:hover { background: var(--surface-2); border-color: var(--border-mid); box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+.card.selected { border-color: var(--brand-accent); box-shadow: 0 0 0 2px var(--brand-accent-soft); }

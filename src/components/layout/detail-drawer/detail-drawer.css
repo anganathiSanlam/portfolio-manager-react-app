@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   z-index: 40;
-  background: rgba(0, 0, 0, .45);
+  background: rgba(0, 0, 0, .3);
   opacity: 0;
   pointer-events: none;
   transition: opacity .22s ease;
@@ -16,8 +16,9 @@
   display: flex;
   width: min(500px, 95vw);
   flex-direction: column;
-  background: var(--sidebar);
-  border-left: 1px solid var(--line);
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  box-shadow: -4px 0 24px rgba(0,0,0,.12);
   transform: translateX(105%);
   transition: transform .22s ease;
 }
@@ -28,11 +29,13 @@
   align-items: flex-start;
   gap: 12px;
   padding: 20px 20px 16px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--border);
+  background: var(--brand-primary);
+  color: #fff;
 }
 .drawer-header-text { flex: 1; }
-.drawer-title { font-size: 16px; font-weight: 650; letter-spacing: -.3px; }
-.drawer-subtitle { margin-top: 2px; color: var(--muted); font-size: 12px; }
+.drawer-title { font-size: 16px; font-weight: 650; letter-spacing: -.3px; color: #fff; }
+.drawer-subtitle { margin-top: 2px; color: rgba(255,255,255,0.7); font-size: 12px; }
 .drawer-close { flex-shrink: 0; }
 
 .drawer-body { flex: 1; padding: 20px; overflow-y: auto; }
@@ -40,7 +43,7 @@
 .drawer-section { margin-bottom: 24px; }
 .drawer-section-label {
   margin-bottom: 10px;
-  color: var(--muted);
+  color: var(--text-muted);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: .06em;
@@ -52,9 +55,9 @@
   justify-content: space-between;
   align-items: center;
   padding: 7px 0;
-  border-bottom: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--border);
   font-size: 13px;
 }
 .drawer-row:last-child { border-bottom: 0; }
-.drawer-row-label { color: var(--muted); }
+.drawer-row-label { color: var(--text-muted); }
 .drawer-row-value { font-weight: 530; }

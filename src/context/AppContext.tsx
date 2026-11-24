@@ -129,7 +129,7 @@ export type AppAction =
   | { type: "REMOVE_TOAST"; message: string };
 
 const initialState: AppState = {
-  activeSection: "today",
+  activeSection: "prepare",
   portfolio: "Moderate portfolio",
   approved: new Set(),
   selectedRole: "PM · Luyolo",

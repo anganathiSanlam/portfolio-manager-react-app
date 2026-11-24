@@ -5,12 +5,13 @@
   align-items: center;
   gap: 10px;
   padding: 0 24px;
-  background: var(--sidebar);
-  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
 }
 
-.topbar-title { flex: 1; font-size: 16px; font-weight: 650; letter-spacing: -.3px; }
-.topbar-sub { color: var(--muted); font-size: 12px; font-weight: 400; }
+.topbar-title { flex: 1; font-size: 16px; font-weight: 650; color: var(--text); letter-spacing: -.3px; }
+.topbar-sub { color: var(--text-muted); font-size: 12px; font-weight: 400; }
 
 .topbar-actions { display: flex; align-items: center; gap: 8px; }
 
@@ -19,19 +20,17 @@
   width: 34px;
   height: 34px;
   place-items: center;
-  border: 1px solid transparent;
+  border: 1px solid var(--border);
   border-radius: 8px;
   background: transparent;
-  color: var(--muted);
+  color: var(--text-muted);
   cursor: pointer;
   transition: background .15s, color .15s, border-color .15s;
 }
-.icon-btn:hover { background: #252e38; border-color: #3a4652; color: var(--text); }
-.icon-btn.active { background: #252e38; border-color: #3a4652; color: var(--green); }
+.icon-btn:hover { background: var(--surface-2); border-color: var(--border-mid); color: var(--text); }
+.icon-btn.active { background: var(--brand-accent-soft); border-color: var(--brand-accent); color: var(--brand-primary); }
 
-.topbar-audit-btn {
-  position: relative;
-}
+.topbar-audit-btn { position: relative; }
 
 .topbar-audit-badge {
   position: absolute;
@@ -41,8 +40,8 @@
   height: 14px;
   padding: 0 3px;
   border-radius: 7px;
-  background: var(--amber);
-  color: #0d0e11;
+  background: var(--warning);
+  color: #fff;
   font-size: 9px;
   font-weight: 740;
   line-height: 14px;
@@ -55,17 +54,17 @@
   align-items: center;
   gap: 8px;
   padding: 6px 11px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--panel);
+  background: var(--surface);
   cursor: pointer;
   font-size: 13px;
   color: var(--text);
   transition: background .15s, border-color .15s;
 }
-.portfolio-select:hover { background: var(--panel-hover); border-color: #3a4652; }
+.portfolio-select:hover { background: var(--surface-2); border-color: var(--border-mid); }
 .portfolio-select-name { font-weight: 600; }
-.portfolio-select-arrow { color: var(--muted); font-size: 11px; }
+.portfolio-select-arrow { color: var(--text-muted); font-size: 11px; }
 
 @media (max-width: 760px) {
   .topbar { padding: 0 14px; }

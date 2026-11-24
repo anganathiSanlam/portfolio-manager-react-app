@@ -14,9 +14,10 @@
   font-weight: 710;
   letter-spacing: -.5px;
 }
+.page-heading h1 { color: var(--brand-primary); }
 .page-heading-sub {
   margin-top: 4px;
-  color: var(--muted);
+  color: var(--text-muted);
   font-size: 13px;
 }
 

@@ -23,8 +23,18 @@
 @import "./components/common/list/list.css";
 
 /* ============================================================
-   @IMPORTS — page components
+   @IMPORTS — page components (active)
    ============================================================ */
+@import "./components/calendar/calendar.css";
+@import "./components/notes/notes.css";
+@import "./components/data-health/data-health.css";
+@import "./components/audit/audit.css";
+@import "./components/generic-page/generic-page.css";
+@import "./components/prepare/prepare.css";
+@import "./components/research/research.css";
+@import "./components/present/present.css";
+@import "./components/sources/sources.css";
+/* parked pages — keep CSS so files compile */
 @import "./components/today/today.css";
 @import "./components/portfolios/portfolios.css";
 @import "./components/funds/funds.css";
@@ -32,33 +42,59 @@
 @import "./components/rebalance/rebalance.css";
 @import "./components/risk/risk.css";
 @import "./components/fees/fees.css";
-@import "./components/calendar/calendar.css";
-@import "./components/notes/notes.css";
-@import "./components/data-health/data-health.css";
-@import "./components/audit/audit.css";
-@import "./components/generic-page/generic-page.css";
 @import "./components/actions/actions.css";
 
 /* ============================================================
-   GLOBAL DESIGN TOKENS — all colours, fonts, spacing, radii
+   GLOBAL DESIGN TOKENS — Sanlam light theme
    ============================================================ */
 :root {
-  color-scheme: dark;
-  --page: #12171d;
-  --sidebar: #1b222a;
-  --panel: #1c232c;
-  --panel-hover: #242d37;
-  --panel-soft: #171d24;
-  --line: #303943;
-  --line-soft: #28313a;
-  --text: #e6e9ed;
-  --muted: #9aa3ad;
-  --quiet: #727d88;
-  --green: #8bc7ac;
-  --green-strong: #75c19a;
-  --amber: #e7c47c;
-  --red: #df747c;
-  --sidebar-width: 190px;
+  color-scheme: light;
+
+  /* Brand */
+  --brand-primary:       #015376;
+  --brand-accent:        #00B5ED;
+  --brand-accent-soft:   #E6F7FD;
+  --brand-accent-mid:    #B3E8FA;
+
+  /* Surfaces */
+  --bg:        #F5F8FA;
+  --surface:   #FFFFFF;
+  --surface-2: #F0F4F7;
+
+  /* Borders */
+  --border:    #DCE4EA;
+  --border-mid: #C5D2DB;
+
+  /* Text */
+  --text:      #1A2B36;
+  --text-muted: #5B6B77;
+  --text-quiet: #8A9BA8;
+
+  /* Semantic */
+  --positive:  #1A7D4A;
+  --positive-bg: #E6F5ED;
+  --warning:   #B25E00;
+  --warning-bg: #FEF3E2;
+  --negative:  #C0303A;
+  --negative-bg: #FDEAEA;
+
+  /* Legacy aliases so old components still compile */
+  --page:         var(--bg);
+  --sidebar:      var(--surface);
+  --panel:        var(--surface);
+  --panel-hover:  var(--surface-2);
+  --panel-soft:   var(--surface-2);
+  --line:         var(--border);
+  --line-soft:    var(--border);
+  --muted:        var(--text-muted);
+  --quiet:        var(--text-quiet);
+  --green:        var(--positive);
+  --green-strong: #15693d;
+  --amber:        var(--warning);
+  --red:          var(--negative);
+
+  --sidebar-width: 200px;
+
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -71,7 +107,7 @@ body {
   min-width: 360px;
   min-height: 100vh;
   margin: 0;
-  background: var(--page);
+  background: var(--bg);
   color: var(--text);
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
@@ -80,7 +116,7 @@ body {
 button, input, textarea { font: inherit; }
 button { color: inherit; }
 button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible {
-  outline: 2px solid var(--green);
+  outline: 2px solid var(--brand-accent);
   outline-offset: 3px;
 }
 
@@ -102,41 +138,78 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   display: flex;
   gap: 0;
   margin-bottom: 24px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 2px solid var(--border);
   padding: 0;
 }
 
 .page-tab {
-  padding: 9px 16px;
-  font-size: 12px;
-  font-weight: 580;
-  color: var(--muted);
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
   cursor: pointer;
   transition: color .15s, border-color .15s;
-  margin-bottom: -1px;
+  margin-bottom: -2px;
   letter-spacing: .01em;
   white-space: nowrap;
 }
 .page-tab:hover { color: var(--text); }
 .page-tab.active,
 .page-tab[aria-selected="true"] {
-  color: var(--text);
-  border-bottom-color: var(--green);
+  color: var(--brand-primary);
+  border-bottom-color: var(--brand-accent);
   font-weight: 650;
 }
 
 /* ============================================================
-   SAMPLE DATA LABEL — subtle inline badge for demo figures
+   SOURCE BADGE — data provenance label
+   ============================================================ */
+.source-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-quiet);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   SAMPLE DATA LABEL
    ============================================================ */
 .sample-data-label {
   font-size: 10px;
   font-weight: 500;
-  color: var(--quiet);
+  color: var(--text-quiet);
   margin-left: 10px;
   text-transform: uppercase;
   letter-spacing: .07em;
   vertical-align: middle;
 }
+
+/* ============================================================
+   PLACEHOLDER (remove once tabs are built)
+   ============================================================ */
+.prepare-placeholder {
+  padding: 40px 24px;
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  text-align: center;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  font-size: 13px;
+}
+
+/* ============================================================
+   UTILITY
+   ============================================================ */
+.text-positive { color: var(--positive); }
+.text-negative { color: var(--negative); }
+.text-warning  { color: var(--warning);  }
+.text-muted    { color: var(--text-muted); }

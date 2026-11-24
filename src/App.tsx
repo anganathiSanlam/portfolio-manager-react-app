@@ -1,24 +1,21 @@
 import { AppProvider, useApp } from "./context/AppContext";
 import AppShell from "./components/layout/app-shell/AppShell";
-import Today from "./components/today/Today";
-import Portfolios from "./components/portfolios/Portfolios";
-import Funds from "./components/funds/Funds";
-import ActionsPage from "./components/actions/ActionsPage";
+import PreparePage from "./components/prepare/PreparePage";
+import ResearchPage from "./components/research/ResearchPage";
+import PresentPage from "./components/present/PresentPage";
 import CalendarPage from "./components/calendar/CalendarPage";
-import ControlPage from "./components/control/ControlPage";
-import "./components/news/news.css";
+import SourcesPage from "./components/sources/SourcesPage";
 
 function PageRouter() {
   const { state } = useApp();
 
   switch (state.activeSection) {
-    case "today":      return <Today />;
-    case "portfolios": return <Portfolios />;
-    case "funds":      return <Funds />;
-    case "actions":    return <ActionsPage />;
-    case "calendar":   return <CalendarPage />;
-    case "control":    return <ControlPage />;
-    default:           return <Today />;
+    case "prepare":  return <PreparePage />;
+    case "research": return <ResearchPage />;
+    case "present":  return <PresentPage />;
+    case "calendar": return <CalendarPage />;
+    case "sources":  return <SourcesPage />;
+    default:         return <PreparePage />;
   }
 }
 
