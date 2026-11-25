@@ -6,6 +6,7 @@ import ClientsPage from "./components/clients/ClientsPage";
 import PresentPage from "./components/present/PresentPage";
 import CalendarPage from "./components/calendar/CalendarPage";
 import SourcesPage from "./components/sources/SourcesPage";
+import TradesPage from "./components/trades/TradesPage";
 
 function PageRouter() {
   const { state } = useApp();
@@ -14,6 +15,7 @@ function PageRouter() {
     case "prepare":  return <PreparePage />;
     case "research": return <ResearchPage />;
     case "clients":  return <ClientsPage />;
+    case "trades":   return <TradesPage />;
     case "present":  return <PresentPage />;
     case "calendar": return <CalendarPage />;
     case "sources":  return <SourcesPage />;

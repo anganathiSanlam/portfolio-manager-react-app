@@ -9,15 +9,16 @@ import { getClientsData, type Client } from "../../connectors/clients";
 import { useApp } from "../../context/AppContext";
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
-  BarChart, Bar
+  BarChart, Bar, PieChart, Pie, Cell,
 } from "recharts";
 import ProgressRing from "../common/charts/ProgressRing";
 import DonutChart from "../common/charts/DonutChart";
 import "./present.css";
 
 const TABS = [
-  { id: "clientstory", label: "Client story" },
-  { id: "whitelabel",  label: "White label" },
+  { id: "clientstory",  label: "Client story" },
+  { id: "whitelabel",   label: "White label" },
+  { id: "tradepreview", label: "Trade preview" },
 ];
 
 export default function PresentPage() {
@@ -67,8 +68,9 @@ export default function PresentPage() {
       )}
 
       <Tabs page="present" tabs={TABS} />
-      {tab === "clientstory" && <ClientStoryTab trade={trade} perf={perf} ab={ab} selectedClient={selectedClient} />}
-      {tab === "whitelabel"  && <WhiteLabelTab trade={trade} perf={perf} ab={ab} selectedClient={selectedClient} />}
+      {tab === "clientstory"  && <ClientStoryTab trade={trade} perf={perf} ab={ab} selectedClient={selectedClient} />}
+      {tab === "whitelabel"   && <WhiteLabelTab  trade={trade} perf={perf} ab={ab} selectedClient={selectedClient} />}
+      {tab === "tradepreview" && <TradePreviewTab />}
     </div>
   );
 }
@@ -341,6 +343,207 @@ function WhiteLabelTab({ trade, perf, ab, selectedClient }: { trade: TradeZaData
       </div>
 
       <StoryContent trade={trade} perf={perf} ab={ab} brandColor={brandColor} advisorName={advisorName} logoLabel={logoText} selectedClient={selectedClient} />
+    </div>
+  );
+}
+
+/* ─── TRADE PREVIEW TAB ──────────────────────────────────── */
+
+type ChartType   = "pie" | "bar" | "table";
+type Dimension   = "fund" | "assetClass";
+type Metric      = "allocationPct" | "valueZAR";
+
+const CHART_COLORS = [
+  "#015376","#00B5ED","#1A7D4A","#B25E00","#C0303A",
+  "#5B3FA0","#005E7A","#C0421C","#2D7D9A","#4A7F3A",
+];
+
+function fmt(v: number) {
+  return new Intl.NumberFormat("en-ZA", {
+    style: "currency", currency: "ZAR", maximumFractionDigits: 0,
+  }).format(v);
+}
+
+function TradePreviewTab() {
+  const { state } = useApp();
+  const { trades } = state;
+
+  const [tradeId,   setTradeId]   = useState<string>(trades[0]?.id ?? "");
+  const [chartType, setChartType] = useState<ChartType>("bar");
+  const [dimension, setDimension] = useState<Dimension>("fund");
+  const [metric,    setMetric]    = useState<Metric>("allocationPct");
+
+  const trade = trades.find(t => t.id === tradeId) ?? null;
+
+  /* build chart data */
+  type ChartDatum = { name: string; value: number };
+  const chartData: ChartDatum[] = !trade ? [] : (() => {
+    if (dimension === "fund") {
+      return trade.holdings.map(h => ({
+        name:  h.fundName.length > 24 ? h.fundName.slice(0, 22) + "…" : h.fundName,
+        value: metric === "allocationPct" ? h.allocationPct : h.valueZAR,
+      }));
+    }
+    // group by asset class
+    const map = new Map<string, number>();
+    trade.holdings.forEach(h => {
+      map.set(h.assetClass, (map.get(h.assetClass) ?? 0) + (metric === "allocationPct" ? h.allocationPct : h.valueZAR));
+    });
+    return [...map.entries()].map(([name, value]) => ({ name, value }));
+  })();
+
+  const metricLabel = metric === "allocationPct" ? "Allocation %" : "Value (ZAR)";
+  const metricFmt   = (v: number) => metric === "allocationPct" ? `${v.toFixed(1)}%` : fmt(v);
+
+  return (
+    <div className="trade-preview-tab">
+      {/* Controls */}
+      <div className="card trade-preview-controls">
+        <div className="tp-control-row">
+          <span className="tp-label">Trade</span>
+          <select className="tp-select" value={tradeId} onChange={e => setTradeId(e.target.value)}>
+            {trades.length === 0 && <option value="">No trades imported yet</option>}
+            {trades.map(t => (
+              <option key={t.id} value={t.id}>
+                {t.reference} · {t.clientName} · {t.tradeDate}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="tp-control-row">
+          <span className="tp-label">Chart type</span>
+          <div className="tp-toggle-group">
+            {(["bar","pie","table"] as ChartType[]).map(c => (
+              <button key={c} className={`tp-toggle${chartType === c ? " active" : ""}`}
+                onClick={() => setChartType(c)}>
+                {c === "bar" ? "📊 Bar" : c === "pie" ? "🥧 Pie" : "📋 Table"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="tp-control-row">
+          <span className="tp-label">Group by</span>
+          <div className="tp-toggle-group">
+            <button className={`tp-toggle${dimension === "fund" ? " active" : ""}`}
+              onClick={() => setDimension("fund")}>By fund</button>
+            <button className={`tp-toggle${dimension === "assetClass" ? " active" : ""}`}
+              onClick={() => setDimension("assetClass")}>By asset class</button>
+          </div>
+        </div>
+
+        <div className="tp-control-row">
+          <span className="tp-label">Metric</span>
+          <div className="tp-toggle-group">
+            <button className={`tp-toggle${metric === "allocationPct" ? " active" : ""}`}
+              onClick={() => setMetric("allocationPct")}>Allocation %</button>
+            <button className={`tp-toggle${metric === "valueZAR" ? " active" : ""}`}
+              onClick={() => setMetric("valueZAR")}>Value (ZAR)</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Visualisation */}
+      {trade && (
+        <div className="card">
+          <div className="card-header">
+            <span className="card-title">
+              {trade.clientName} · {trade.reference}
+            </span>
+            <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+              {metricLabel} · {dimension === "fund" ? "by fund" : "by asset class"}
+            </span>
+          </div>
+
+          {chartType === "bar" && (
+            <ResponsiveContainer width="100%" height={Math.max(200, chartData.length * 42)}>
+              <BarChart data={chartData} layout="vertical"
+                margin={{ top: 4, right: 60, bottom: 4, left: 180 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
+                <XAxis type="number" tick={{ fontSize: 11, fill: "var(--text-muted)" }}
+                  tickFormatter={metricFmt} />
+                <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: "var(--text)" }}
+                  width={175} />
+                <Tooltip formatter={(v) => [metricFmt(Number(v)), metricLabel]} />
+                <Bar dataKey="value" radius={[0,4,4,0]}>
+                  {chartData.map((_, i) => (
+                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+
+          {chartType === "pie" && (
+            <div style={{ display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap" }}>
+              <ResponsiveContainer width={300} height={280}>
+                <PieChart>
+                  <Pie data={chartData} dataKey="value" cx="50%" cy="50%"
+                    outerRadius={110} paddingAngle={2}
+                    label={({ percent }) => `${((percent ?? 0) * 100).toFixed(0)}%`}
+                    labelLine={false}>
+                    {chartData.map((_, i) => (
+                      <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(v) => [metricFmt(Number(v)), metricLabel]} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="tp-pie-legend">
+                {chartData.map((d, i) => (
+                  <div key={i} className="tp-legend-row">
+                    <span className="tp-legend-dot"
+                      style={{ background: CHART_COLORS[i % CHART_COLORS.length] }} />
+                    <span className="tp-legend-name">{d.name}</span>
+                    <span className="tp-legend-val">{metricFmt(d.value)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {chartType === "table" && (
+            <table className="holdings-table" style={{ marginTop: 4 }}>
+              <thead>
+                <tr>
+                  <th>{dimension === "fund" ? "Fund" : "Asset class"}</th>
+                  <th style={{ textAlign:"right" }}>{metricLabel}</th>
+                  {dimension === "fund" && <th>ISIN</th>}
+                  {dimension === "fund" && <th>Instruction</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {chartData.map((d, i) => {
+                  const h = trade.holdings[i];
+                  return (
+                    <tr key={i}>
+                      <td>{d.name}</td>
+                      <td style={{ textAlign:"right", fontWeight: 650 }}>{metricFmt(d.value)}</td>
+                      {dimension === "fund" && h && (
+                        <>
+                          <td><span className="holdings-isin">{h.isin}</span></td>
+                          <td><span className={`instr-badge ${h.instruction === "Buy" ? "buy" : h.instruction === "Sell" ? "sell" : "switch"}`}>{h.instruction}</span></td>
+                        </>
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
+
+      {!trade && trades.length === 0 && (
+        <div className="card trades-empty">
+          <div className="trades-empty-icon">📊</div>
+          <div className="trades-empty-title">No trades imported yet</div>
+          <div className="trades-empty-sub">
+            Go to the Trades page to import a trade sheet, then return here to visualise it.
+          </div>
+        </div>
+      )}
     </div>
   );
 }

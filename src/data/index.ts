@@ -8,6 +8,7 @@ export const navigation: NavItem[] = [
   { id: "clients",  number: "",   label: "Clients" },
   { id: "prepare",  number: "",   label: "Prepare",         alert: true,  groupLabel: "WORKSPACE" },
   { id: "research", number: "",   label: "Research" },
+  { id: "trades",   number: "",   label: "Trades" },
   { id: "present",  number: "",   label: "Present" },
   { id: "calendar", number: "",   label: "Meetings & Notes" },
   { id: "sources",  number: "",   label: "Sources",         alert: true },

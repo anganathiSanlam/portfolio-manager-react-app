@@ -2,6 +2,7 @@ import { createContext, useContext, useReducer, type ReactNode } from "react";
 import type { NoteRecord } from "../data/types";
 import { noteRecords as initialNoteRecords } from "../data";
 import type { PrepStatus } from "../connectors/outlook";
+import { getDummyTrades, type ImportedTrade } from "../connectors/trades";
 
 export type Rating = "A" | "AA" | "AAA";
 
@@ -108,6 +109,9 @@ export interface AppState {
   packQueue: PackItem[];
   selectedClientId: string;
   clientNotes: Record<string, string>;
+  trades: ImportedTrade[];
+  selectedTradeId: string;
+  tradeNotes: Record<string, string>;
 }
 
 export interface PackItem {
@@ -191,7 +195,10 @@ export type AppAction =
   | { type: "REORDER_PACK"; fromIndex: number; toIndex: number }
   | { type: "CLEAR_PACK" }
   | { type: "SET_SELECTED_CLIENT"; id: string }
-  | { type: "SET_CLIENT_NOTE"; clientId: string; note: string };
+  | { type: "SET_CLIENT_NOTE"; clientId: string; note: string }
+  | { type: "ADD_TRADE"; trade: ImportedTrade }
+  | { type: "SET_SELECTED_TRADE"; id: string }
+  | { type: "SET_TRADE_NOTE"; tradeId: string; note: string };
 
 const initialState: AppState = {
   activeSection: "prepare",
@@ -280,6 +287,9 @@ const initialState: AppState = {
   packQueue: [],
   selectedClientId: "c001",
   clientNotes: {},
+  trades: getDummyTrades(),
+  selectedTradeId: "T001",
+  tradeNotes: {},
 };
 
 function reducer(state: AppState, action: AppAction): AppState {
@@ -431,6 +441,12 @@ function reducer(state: AppState, action: AppAction): AppState {
       return { ...state, selectedClientId: action.id };
     case "SET_CLIENT_NOTE":
       return { ...state, clientNotes: { ...state.clientNotes, [action.clientId]: action.note } };
+    case "ADD_TRADE":
+      return { ...state, trades: [action.trade, ...state.trades], selectedTradeId: action.trade.id };
+    case "SET_SELECTED_TRADE":
+      return { ...state, selectedTradeId: action.id };
+    case "SET_TRADE_NOTE":
+      return { ...state, tradeNotes: { ...state.tradeNotes, [action.tradeId]: action.note } };
     default: return state;
   }
 }
