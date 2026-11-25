@@ -32,6 +32,7 @@
 @import "./components/generic-page/generic-page.css";
 @import "./components/prepare/prepare.css";
 @import "./components/research/research.css";
+@import "./components/clients/clients.css";
 @import "./components/present/present.css";
 @import "./components/sources/sources.css";
 /* parked pages — keep CSS so files compile */
@@ -141,6 +142,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   gap: 0;
   border-bottom: 2px solid var(--border);
   padding: 0;
+  margin-bottom: 24px;
 }
 
 /* ── LINEAR FLOW NAV ── */
@@ -148,7 +150,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 7px 2px;
+  padding: 6px 2px;
+  margin-top: -18px;
   margin-bottom: 20px;
   border-bottom: 1px solid var(--border);
   background: var(--surface);

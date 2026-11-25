@@ -23,7 +23,6 @@ export default function Sidebar() {
               className={`nav-item${state.activeSection === item.id ? " active" : ""}`}
               onClick={() => dispatch({ type: "SET_SECTION", id: item.id })}
             >
-              <span className="nav-number">{item.number}</span>
               <span className="nav-name">{item.label}</span>
               <span className={`nav-indicator${item.alert ? " has-alert" : ""}`} />
             </button>

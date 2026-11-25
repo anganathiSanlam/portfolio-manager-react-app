@@ -43,12 +43,20 @@ export interface TAARow {
   oneYearReturn: number;   // 1Y to Oct 2026
 }
 
+export interface PortfolioWeight {
+  assetClass: string;
+  actualWeight: number;    // %
+  benchmarkWeight: number; // %
+  taaView: -2 | -1 | 0 | 1 | 2;
+}
+
 export interface AlphaBetaData {
   funds: FundScreenRow[];
   houseView: HouseViewRow[];
   taaPositioning: TAARow[];
   saTAA: TAARatingRow[];
   globalTAA: TAARatingRow[];
+  portfolioWeights: PortfolioWeight[];
   _meta: ConnectorMeta;
 }
 
@@ -70,6 +78,12 @@ export async function getAlphaBetaData(): Promise<AlphaBetaData> {
       { id: "spring", name: "Spring SA Bonds", assetClass: "SA Bonds", asisa: "SA Interest Bearing Variable Term", style: "Passive Duration", fee: 0.15, currentQuartile: 2, consistencyScore: 88, persistencyScore: 86, quarterlyQuartiles: [2,2,2,2,2,2,2,2,2,2,2,2] },
       { id: "peak", name: "Peak US Equity", assetClass: "Global Equity", asisa: "Global Equity General", style: "Market Cap", fee: 0.25, currentQuartile: 1, consistencyScore: 86, persistencyScore: 85, quarterlyQuartiles: [1,1,1,2,1,1,1,1,1,1,1,1] },
       { id: "clay", name: "Clay SA Value", assetClass: "SA Equity", asisa: "SA Equity General", style: "Deep Value", fee: 0.85, currentQuartile: 4, consistencyScore: 35, persistencyScore: 32, quarterlyQuartiles: [2,3,3,4,4,3,4,4,4,4,4,4] },
+      { id: "alpine", name: "Alpine SA Inflation-Linked Bonds", assetClass: "SA ILBs", asisa: "SA Interest Bearing Variable Term", style: "Real Return", fee: 0.38, currentQuartile: 1, consistencyScore: 83, persistencyScore: 81, quarterlyQuartiles: [1,1,1,1,2,1,1,1,1,1,2,1] },
+      { id: "tidal", name: "Tidal Global Infrastructure", assetClass: "Global Infrastructure", asisa: "Global Real Assets", style: "Core Infrastructure", fee: 1.05, currentQuartile: 1, consistencyScore: 79, persistencyScore: 75, quarterlyQuartiles: [2,1,1,2,1,1,1,1,2,1,1,1] },
+      { id: "meridian", name: "Meridian SA Multi-Asset", assetClass: "Multi-Asset", asisa: "SA Multi Asset High Equity", style: "Tactical Balanced", fee: 0.75, currentQuartile: 2, consistencyScore: 74, persistencyScore: 71, quarterlyQuartiles: [2,2,2,1,2,2,1,2,2,2,1,2] },
+      { id: "crest", name: "Crest Conservative Multi-Asset", assetClass: "Multi-Asset", asisa: "SA Multi Asset Low Equity", style: "Capital Preservation", fee: 0.60, currentQuartile: 1, consistencyScore: 87, persistencyScore: 85, quarterlyQuartiles: [1,1,2,1,1,2,1,1,1,2,1,1] },
+      { id: "zenith", name: "Zenith Global Bonds", assetClass: "Global Bonds", asisa: "Global Interest Bearing", style: "Active Duration", fee: 0.62, currentQuartile: 2, consistencyScore: 69, persistencyScore: 66, quarterlyQuartiles: [2,2,3,2,2,2,2,3,2,2,2,2] },
+      { id: "kalahari", name: "Kalahari EM Small Cap", assetClass: "EM Equity", asisa: "Global Equity EM", style: "Small Cap Value", fee: 1.30, currentQuartile: 2, consistencyScore: 58, persistencyScore: 55, quarterlyQuartiles: [3,2,2,2,3,2,1,2,2,3,2,2] },
     ],
     houseView: [
       { assetClass: "SA Equity", expectedReturn: 13.5, hurdleRate: 12.0, view: 1, reason: "Cheap on PE; rand tailwind from rate cuts expected.", macro: "SA repo cutting cycle supports consumer spending and earnings re-rating.", allocationChange: "+1pp overweight", sourceRefs: ["Trading Economics — SA repo", "AlphaBeta"] },
@@ -106,6 +120,20 @@ export async function getAlphaBetaData(): Promise<AlphaBetaData> {
       { assetClass: "Global Infrastructure", currentMin:  0.5, currentMax:  1.5, forwardView:  1.0, historicalReturns: { "2018": -4.0,  "2019": 23.2, "2020":  7.9, "2021": 15.4, "2022":  -7.2, "2023":  6.8, "2024": 10.5, "2025":  8.1 }, oneYearReturn:  9.3 },
       { assetClass: "Global Property",       currentMin: -1.0, currentMax:  0.0, forwardView: -0.5, historicalReturns: { "2018": -6.0,  "2019": 23.1, "2020": -6.3, "2021": 24.8, "2022": -24.1, "2023":  9.4, "2024":  4.7, "2025":  6.2 }, oneYearReturn:  7.8 },
       { assetClass: "Global Cash",           currentMin: -0.5, currentMax:  0.5, forwardView:  0.3, historicalReturns: { "2018":  1.8,  "2019":  2.4, "2020":  0.9, "2021":  0.4, "2022":   2.2, "2023":  5.4, "2024":  5.1, "2025":  4.8 }, oneYearReturn:  4.5 },
+    ],
+    portfolioWeights: [
+      { assetClass: "SA Equity",             actualWeight: 26, benchmarkWeight: 24, taaView:  1 },
+      { assetClass: "SA Bonds",              actualWeight: 21, benchmarkWeight: 20, taaView:  2 },
+      { assetClass: "SA ILBs",               actualWeight:  5, benchmarkWeight:  5, taaView:  0 },
+      { assetClass: "SA Property",           actualWeight:  3, benchmarkWeight:  5, taaView: -1 },
+      { assetClass: "SA Cash",               actualWeight:  5, benchmarkWeight:  5, taaView:  0 },
+      { assetClass: "SA Infrastructure",     actualWeight:  7, benchmarkWeight:  5, taaView:  1 },
+      { assetClass: "DM Equity",             actualWeight: 15, benchmarkWeight: 18, taaView: -1 },
+      { assetClass: "EM Equity",             actualWeight:  7, benchmarkWeight:  7, taaView:  0 },
+      { assetClass: "Global Bonds",          actualWeight:  5, benchmarkWeight:  7, taaView: -1 },
+      { assetClass: "Global ILB",            actualWeight:  2, benchmarkWeight:  1, taaView:  0 },
+      { assetClass: "Global Infrastructure", actualWeight:  2, benchmarkWeight:  1, taaView:  1 },
+      { assetClass: "Global Property",       actualWeight:  2, benchmarkWeight:  2, taaView: -1 },
     ],
     _meta: { source: "AlphaBeta", asOf: "22 Nov 18:00", simulated: true },
   };

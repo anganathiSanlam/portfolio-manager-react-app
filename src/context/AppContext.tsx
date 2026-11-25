@@ -1,6 +1,39 @@
 import { createContext, useContext, useReducer, type ReactNode } from "react";
 import type { NoteRecord } from "../data/types";
 import { noteRecords as initialNoteRecords } from "../data";
+import type { PrepStatus } from "../connectors/outlook";
+
+export type Rating = "A" | "AA" | "AAA";
+
+export interface InterviewNote {
+  id: string;
+  fundId: string;
+  fundName: string;
+  date: string;         // YYYY-MM-DD
+  linkedMeetingId?: string;
+  teamScore: number;        // 1–5
+  processScore: number;     // 1–5
+  philosophyScore: number;  // 1–5
+  philosophy: string;
+  team: string;
+  process: string;
+  strengths: string;
+  concerns: string;
+  followUps: string;
+}
+
+export interface Task {
+  id: string;
+  description: string;
+  owner: string;
+  dueDate: string;      // YYYY-MM-DD
+  linkedItem: string;
+  linkedType: "fund" | "manager" | "meeting" | "other";
+  linkedId?: string;
+  status: "open" | "done";
+  source: "note" | "manual";
+  sourceNoteId?: string;
+}
 
 export interface AppState {
   activeSection: string;
@@ -65,6 +98,23 @@ export interface AppState {
   drawerFundId: string;
   pageTab: Record<string, string>;
   toasts: string[];
+  meetingPrepStatus: Record<string, PrepStatus>;
+  interviewNotes: InterviewNote[];
+  tasks: Task[];
+  fundRatingOverrides: Record<string, { risk?: Rating; skill?: Rating; esg?: Rating }>;
+  prepPackMeetingId: string;   // empty = overlay closed
+  showOtherMeetings: boolean;
+  pmInsights: Record<string, { myView: string; pushOn: string; redFlags: string }>;
+  packQueue: PackItem[];
+  selectedClientId: string;
+  clientNotes: Record<string, string>;
+}
+
+export interface PackItem {
+  id: string;
+  title: string;
+  section: string;    // e.g. "markets", "economy"
+  sourceTab: string;  // the prepare tab it came from
 }
 
 export type AppAction =
@@ -126,7 +176,22 @@ export type AppAction =
   | { type: "OPEN_DRAWER"; title: string; description: string; fundId?: string }
   | { type: "CLOSE_DRAWER" }
   | { type: "ADD_TOAST"; message: string }
-  | { type: "REMOVE_TOAST"; message: string };
+  | { type: "REMOVE_TOAST"; message: string }
+  | { type: "SET_MEETING_PREP_STATUS"; meetingId: string; status: PrepStatus }
+  | { type: "ADD_INTERVIEW_NOTE"; note: InterviewNote }
+  | { type: "ADD_TASK"; task: Task }
+  | { type: "TOGGLE_TASK_STATUS"; taskId: string }
+  | { type: "SET_FUND_RATING"; fundId: string; ratingType: "risk" | "skill" | "esg"; rating: Rating }
+  | { type: "OPEN_PREP_PACK"; meetingId: string }
+  | { type: "CLOSE_PREP_PACK" }
+  | { type: "TOGGLE_SHOW_OTHER_MEETINGS" }
+  | { type: "SET_PM_INSIGHT"; fundId: string; field: "myView" | "pushOn" | "redFlags"; value: string }
+  | { type: "ADD_TO_PACK"; item: PackItem }
+  | { type: "REMOVE_FROM_PACK"; id: string }
+  | { type: "REORDER_PACK"; fromIndex: number; toIndex: number }
+  | { type: "CLEAR_PACK" }
+  | { type: "SET_SELECTED_CLIENT"; id: string }
+  | { type: "SET_CLIENT_NOTE"; clientId: string; note: string };
 
 const initialState: AppState = {
   activeSection: "prepare",
@@ -190,7 +255,31 @@ const initialState: AppState = {
   drawerDescription: "",
   drawerFundId: "",
   pageTab: {},
-  toasts: []
+  toasts: [],
+  meetingPrepStatus: {
+    "meet-001": "needs-input",
+    "meet-002": "not-started",
+    "meet-003": "not-started",
+    "meet-004": "needs-input",
+    "meet-005": "not-started",
+    "meet-006": "not-started",
+    "meet-007": "not-started",
+    "meet-008": "not-started",
+  },
+  interviewNotes: [],
+  tasks: [
+    { id: "task-001", description: "Northstar to provide attribution for US mega-cap concentration", owner: "Northstar PM", dueDate: "2026-12-05", linkedItem: "Northstar Global Equity", linkedType: "fund", linkedId: "northstar", status: "open", source: "manual" },
+    { id: "task-002", description: "Review style drift against mandate tolerance", owner: "PM · Luyolo", dueDate: "2026-11-30", linkedItem: "Northstar Global Equity", linkedType: "fund", linkedId: "northstar", status: "open", source: "manual" },
+    { id: "task-003", description: "Confirm Northstar fee schedule at 1.00%", owner: "PM · Luyolo", dueDate: "2026-11-25", linkedItem: "Northstar Global Equity", linkedType: "fund", linkedId: "northstar", status: "done", source: "manual" },
+    { id: "task-004", description: "Prepare December IC pack slides", owner: "PM · Luyolo", dueDate: "2026-11-27", linkedItem: "IC December", linkedType: "other", status: "open", source: "manual" },
+  ],
+  fundRatingOverrides: {},
+  prepPackMeetingId: "",
+  showOtherMeetings: false,
+  pmInsights: {},
+  packQueue: [],
+  selectedClientId: "c001",
+  clientNotes: {},
 };
 
 function reducer(state: AppState, action: AppAction): AppState {
@@ -309,6 +398,39 @@ function reducer(state: AppState, action: AppAction): AppState {
     case "CLOSE_DRAWER": return { ...state, drawerOpen: false, drawerFundId: "" };
     case "ADD_TOAST": return { ...state, toasts: [...state.toasts, action.message] };
     case "REMOVE_TOAST": return { ...state, toasts: state.toasts.filter((t) => t !== action.message) };
+    case "SET_MEETING_PREP_STATUS": return { ...state, meetingPrepStatus: { ...state.meetingPrepStatus, [action.meetingId]: action.status } };
+    case "ADD_INTERVIEW_NOTE": return { ...state, interviewNotes: [action.note, ...state.interviewNotes] };
+    case "ADD_TASK": return { ...state, tasks: [action.task, ...state.tasks] };
+    case "TOGGLE_TASK_STATUS": return { ...state, tasks: state.tasks.map(t => t.id === action.taskId ? { ...t, status: t.status === "open" ? "done" : "open" } : t) };
+    case "SET_FUND_RATING": {
+      const existing = state.fundRatingOverrides[action.fundId] ?? {};
+      return { ...state, fundRatingOverrides: { ...state.fundRatingOverrides, [action.fundId]: { ...existing, [action.ratingType]: action.rating } } };
+    }
+    case "OPEN_PREP_PACK": return { ...state, prepPackMeetingId: action.meetingId };
+    case "CLOSE_PREP_PACK": return { ...state, prepPackMeetingId: "" };
+    case "TOGGLE_SHOW_OTHER_MEETINGS": return { ...state, showOtherMeetings: !state.showOtherMeetings };
+    case "SET_PM_INSIGHT": {
+      const existing = state.pmInsights[action.fundId] ?? { myView: "", pushOn: "", redFlags: "" };
+      return { ...state, pmInsights: { ...state.pmInsights, [action.fundId]: { ...existing, [action.field]: action.value } } };
+    }
+    case "ADD_TO_PACK": {
+      if (state.packQueue.some(i => i.id === action.item.id)) return state;
+      return { ...state, packQueue: [...state.packQueue, action.item] };
+    }
+    case "REMOVE_FROM_PACK":
+      return { ...state, packQueue: state.packQueue.filter(i => i.id !== action.id) };
+    case "REORDER_PACK": {
+      const q = [...state.packQueue];
+      const [moved] = q.splice(action.fromIndex, 1);
+      q.splice(action.toIndex, 0, moved);
+      return { ...state, packQueue: q };
+    }
+    case "CLEAR_PACK":
+      return { ...state, packQueue: [] };
+    case "SET_SELECTED_CLIENT":
+      return { ...state, selectedClientId: action.id };
+    case "SET_CLIENT_NOTE":
+      return { ...state, clientNotes: { ...state.clientNotes, [action.clientId]: action.note } };
     default: return state;
   }
 }

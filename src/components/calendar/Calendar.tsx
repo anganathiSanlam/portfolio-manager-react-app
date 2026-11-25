@@ -1,3 +1,4 @@
+// Parked: replaced by Meetings & Notes (Outlook is the calendar)
 import { useApp } from "../../context/AppContext";
 import { calendarEvents, pageData } from "../../data";
 import { dateKey } from "../../utility/formatters";

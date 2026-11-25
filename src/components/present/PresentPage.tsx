@@ -5,6 +5,7 @@ import SourceBadge from "../common/source-badge/SourceBadge";
 import { getTradeZaData, type TradeZaData } from "../../connectors/tradeZa";
 import { getPerformanceData, type PerformanceData } from "../../connectors/performanceSystem";
 import { getAlphaBetaData, type AlphaBetaData } from "../../connectors/alphaBeta";
+import { getClientsData, type Client } from "../../connectors/clients";
 import { useApp } from "../../context/AppContext";
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
@@ -21,13 +22,18 @@ const TABS = [
 
 export default function PresentPage() {
   const tab = useActiveTab("present", "clientstory");
+  const { state, dispatch } = useApp();
   const [trade, setTrade] = useState<TradeZaData | null>(null);
   const [perf, setPerf] = useState<PerformanceData | null>(null);
   const [ab, setAb] = useState<AlphaBetaData | null>(null);
+  const [clients, setClients] = useState<Client[]>([]);
 
   useEffect(() => { getTradeZaData().then(setTrade); }, []);
   useEffect(() => { getPerformanceData().then(setPerf); }, []);
   useEffect(() => { getAlphaBetaData().then(setAb); }, []);
+  useEffect(() => { getClientsData().then(d => setClients(d.clients)); }, []);
+
+  const selectedClient = clients.find(c => c.id === state.selectedClientId) ?? null;
 
   return (
     <div>
@@ -37,9 +43,32 @@ export default function PresentPage() {
           <p className="page-heading-sub">Client-ready story and branded exports</p>
         </div>
       </div>
+
+      {/* Client selector */}
+      {clients.length > 0 && (
+        <div className="present-client-selector">
+          <span className="present-client-label">Client</span>
+          <select
+            className="present-client-select"
+            value={state.selectedClientId}
+            onChange={e => dispatch({ type: "SET_SELECTED_CLIENT", id: e.target.value })}
+          >
+            {clients.map(c => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+          {selectedClient && (
+            <span className="present-client-meta">
+              {selectedClient.portfolioType === "model" ? selectedClient.modelPortfolio : "Bespoke mandate"}
+              {" · "}{selectedClient.aumDisplay}
+            </span>
+          )}
+        </div>
+      )}
+
       <Tabs page="present" tabs={TABS} />
-      {tab === "clientstory" && <ClientStoryTab trade={trade} perf={perf} ab={ab} />}
-      {tab === "whitelabel"  && <WhiteLabelTab trade={trade} perf={perf} ab={ab} />}
+      {tab === "clientstory" && <ClientStoryTab trade={trade} perf={perf} ab={ab} selectedClient={selectedClient} />}
+      {tab === "whitelabel"  && <WhiteLabelTab trade={trade} perf={perf} ab={ab} selectedClient={selectedClient} />}
     </div>
   );
 }
@@ -47,7 +76,7 @@ export default function PresentPage() {
 /* ─── SHARED STORY CONTENT ───────────────────────────────── */
 
 function StoryContent({
-  trade, perf, ab, brandColor, advisorName, logoLabel
+  trade, perf, ab, brandColor, advisorName, logoLabel, selectedClient
 }: {
   trade: TradeZaData | null;
   perf: PerformanceData | null;
@@ -55,10 +84,15 @@ function StoryContent({
   brandColor: string;
   advisorName?: string;
   logoLabel?: string;
+  selectedClient?: Client | null;
 }) {
   const { state, dispatch } = useApp();
 
-  const portfolio = state.portfolio;
+  // If a client is selected and they have a model portfolio, use that; otherwise fall back to state.portfolio
+  const portfolio = (selectedClient?.portfolioType === "model" && selectedClient.modelPortfolio)
+    ? selectedClient.modelPortfolio
+    : state.portfolio;
+
   const client = trade?.clientOutcomes.find(c => c.portfolio === portfolio) ?? trade?.clientOutcomes[0];
   const portPerf = perf?.portfolios[portfolio];
 
@@ -126,8 +160,12 @@ function StoryContent({
             <ProgressRing actual={actual} target={target} status={onTrack ? "on-track" : "behind"} size={100} />
           </div>
           <div className="story-goal-text">
-            <div className="story-goal-title" style={{ color: brandColor }}>{client.goalLabel}</div>
-            <div className="story-goal-meta">{client.clientName} · {portfolio}</div>
+            <div className="story-goal-title" style={{ color: brandColor }}>
+              {selectedClient?.goalLabel ?? client.goalLabel}
+            </div>
+            <div className="story-goal-meta">
+              {selectedClient?.name ?? client.clientName} · {portfolio}
+            </div>
             <div className={`story-goal-status${onTrack ? " on-track" : " behind"}`}>
               {onTrack ? "✓ On track" : "⚠ Behind target"}
             </div>
@@ -253,7 +291,7 @@ function StoryContent({
 
 /* ─── CLIENT STORY ───────────────────────────────────────── */
 
-function ClientStoryTab({ trade, perf, ab }: { trade: TradeZaData | null; perf: PerformanceData | null; ab: AlphaBetaData | null }) {
+function ClientStoryTab({ trade, perf, ab, selectedClient }: { trade: TradeZaData | null; perf: PerformanceData | null; ab: AlphaBetaData | null; selectedClient: Client | null }) {
   const [presenting, setPresenting] = useState(false);
 
   return (
@@ -266,7 +304,7 @@ function ClientStoryTab({ trade, perf, ab }: { trade: TradeZaData | null; perf: 
         {presenting && <span className="story-presenting-hint">Sidebar and assistant hidden</span>}
       </div>
       <div className={presenting ? "story-presenting-wrap" : ""}>
-        <StoryContent trade={trade} perf={perf} ab={ab} brandColor="var(--brand-primary)" />
+        <StoryContent trade={trade} perf={perf} ab={ab} brandColor="var(--brand-primary)" selectedClient={selectedClient} />
       </div>
     </div>
   );
@@ -274,7 +312,7 @@ function ClientStoryTab({ trade, perf, ab }: { trade: TradeZaData | null; perf: 
 
 /* ─── WHITE LABEL ────────────────────────────────────────── */
 
-function WhiteLabelTab({ trade, perf, ab }: { trade: TradeZaData | null; perf: PerformanceData | null; ab: AlphaBetaData | null }) {
+function WhiteLabelTab({ trade, perf, ab, selectedClient }: { trade: TradeZaData | null; perf: PerformanceData | null; ab: AlphaBetaData | null; selectedClient: Client | null }) {
   const [brandColor, setBrandColor] = useState("#015376");
   const [advisorName, setAdvisorName] = useState("Advisor Name");
   const [logoText, setLogoText] = useState("Adviser Co");
@@ -302,7 +340,7 @@ function WhiteLabelTab({ trade, perf, ab }: { trade: TradeZaData | null; perf: P
         </button>
       </div>
 
-      <StoryContent trade={trade} perf={perf} ab={ab} brandColor={brandColor} advisorName={advisorName} logoLabel={logoText} />
+      <StoryContent trade={trade} perf={perf} ab={ab} brandColor={brandColor} advisorName={advisorName} logoLabel={logoText} selectedClient={selectedClient} />
     </div>
   );
 }

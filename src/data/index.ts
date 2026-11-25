@@ -5,11 +5,12 @@ import type {
 } from "./types";
 
 export const navigation: NavItem[] = [
-  { id: "prepare",         number: "01", label: "Prepare",           alert: true },
-  { id: "research",        number: "02", label: "Research" },
-  { id: "present",         number: "03", label: "Present" },
-  { id: "calendar",        number: "04", label: "Calendar & Notes" },
-  { id: "sources",         number: "05", label: "Sources",           alert: true },
+  { id: "clients",  number: "",   label: "Clients" },
+  { id: "prepare",  number: "",   label: "Prepare",         alert: true,  groupLabel: "WORKSPACE" },
+  { id: "research", number: "",   label: "Research" },
+  { id: "present",  number: "",   label: "Present" },
+  { id: "calendar", number: "",   label: "Meetings & Notes" },
+  { id: "sources",  number: "",   label: "Sources",         alert: true },
 ];
 
 export const portfolios: Portfolio[] = [

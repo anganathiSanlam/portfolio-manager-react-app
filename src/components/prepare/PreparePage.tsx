@@ -7,13 +7,30 @@ import { getBCAData, type BCAData } from "../../connectors/bcaResearch";
 import { getIMFData, type IMFData } from "../../connectors/imf";
 import { getIressData, type IressData } from "../../connectors/iress";
 import { getSimmData, type SimmData } from "../../connectors/simmInternal";
-import { getAlphaBetaData, type AlphaBetaData, type TAARatingRow, type TAARow } from "../../connectors/alphaBeta";
-import { useApp } from "../../context/AppContext";
+import { getAlphaBetaData, type AlphaBetaData, type TAARatingRow, type TAARow, type PortfolioWeight } from "../../connectors/alphaBeta";
+import { useApp, type PackItem } from "../../context/AppContext";
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, ReferenceLine,
   ResponsiveContainer, CartesianGrid,
 } from "recharts";
 import "./prepare.css";
+
+function AddToPackBtn({ item }: { item: PackItem }) {
+  const { state, dispatch } = useApp();
+  const inQueue = state.packQueue.some(i => i.id === item.id);
+  return (
+    <button
+      className={`add-to-pack-btn${inQueue ? " in-queue" : ""}`}
+      title={inQueue ? "In pack — click to remove" : "Add to pack"}
+      onClick={() => dispatch(inQueue
+        ? { type: "REMOVE_FROM_PACK", id: item.id }
+        : { type: "ADD_TO_PACK", item }
+      )}
+    >
+      {inQueue ? "✓" : "+"}
+    </button>
+  );
+}
 
 const TABS = [
   { id: "markets",    label: "Markets & themes" },
@@ -86,6 +103,7 @@ function MarketsTab({ bloomberg, bca, iress }: {
       <div className="card">
         <div className="card-header">
           <span className="card-title">Market returns — {bloomberg.asOfDate}</span>
+          <AddToPackBtn item={{ id: "market-returns", title: "Market returns", section: "Market returns", sourceTab: "markets" }} />
           <div className="currency-toggle">
             {(["USD","ZAR"] as const).map(c => (
               <button key={c} className={`currency-btn${currency === c ? " active" : ""}`} onClick={() => setCurrency(c)}>{c}</button>
@@ -122,7 +140,10 @@ function MarketsTab({ bloomberg, bca, iress }: {
         </div>
         {iress && (
           <div style={{ marginTop: 16 }}>
-            <div style={{ fontSize: 11, fontWeight: 650, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 8 }}>SA sectors (ZAR)</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+              <div style={{ fontSize: 11, fontWeight: 650, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".05em" }}>SA sectors (ZAR)</div>
+              <AddToPackBtn item={{ id: "sa-sectors", title: "SA sector returns", section: "Market returns", sourceTab: "markets" }} />
+            </div>
             <div style={{ overflowX: "auto" }}>
               <table className="returns-table">
                 <thead><tr><th>Sector</th><th className="num">MTD</th><th className="num">QTD</th><th className="num">1M</th><th className="num">YTD</th></tr></thead>
@@ -158,6 +179,7 @@ function MarketsTab({ bloomberg, bca, iress }: {
                     <div className="theme-tags">
                       {t.tags.map(tag => <span key={tag} className="connector-used-tag">{tag}</span>)}
                     </div>
+                    <AddToPackBtn item={{ id: `theme-${t.id}`, title: t.title, section: "Themes", sourceTab: "markets" }} />
                   </div>
                   <div className="theme-two-col">
                     <div className="theme-narrative-wrap">
@@ -211,7 +233,7 @@ function EconomyTab({ imf, simm }: { imf: IMFData | null; simm: SimmData | null 
       {/* IMF forecasts */}
       <div className="econ-two-col">
         <div className="card">
-          <div className="card-header"><span className="card-title">IMF GDP growth forecasts (%)</span><SourceBadge meta={imf._meta} /></div>
+          <div className="card-header"><span className="card-title">IMF GDP growth forecasts (%)</span><SourceBadge meta={imf._meta} /><AddToPackBtn item={{ id: "imf-gdp", title: "IMF GDP forecasts", section: "Economy", sourceTab: "economy" }} /></div>
           <table className="imf-table">
             <thead><tr><th>Region</th><th className="num">2024</th><th className="num">2025</th><th className="num">2026E</th></tr></thead>
             <tbody>
@@ -227,7 +249,7 @@ function EconomyTab({ imf, simm }: { imf: IMFData | null; simm: SimmData | null 
           </table>
         </div>
         <div className="card">
-          <div className="card-header"><span className="card-title">IMF inflation forecasts (%)</span></div>
+          <div className="card-header"><span className="card-title">IMF inflation forecasts (%)</span><AddToPackBtn item={{ id: "imf-inflation", title: "IMF inflation forecasts", section: "Economy", sourceTab: "economy" }} /></div>
           <table className="imf-table">
             <thead><tr><th>Region</th><th className="num">2024</th><th className="num">2025</th><th className="num">2026E</th></tr></thead>
             <tbody>
@@ -246,7 +268,7 @@ function EconomyTab({ imf, simm }: { imf: IMFData | null; simm: SimmData | null 
 
       {/* PMI heatmap */}
       <div className="card">
-        <div className="card-header"><span className="card-title">Global Manufacturing PMI</span><span className="sample-data-label">≥50 = expansion</span></div>
+        <div className="card-header"><span className="card-title">Global Manufacturing PMI</span><span className="sample-data-label">≥50 = expansion</span><AddToPackBtn item={{ id: "pmi-heatmap", title: "Global Manufacturing PMI", section: "Economy", sourceTab: "economy" }} /></div>
         <div style={{ overflowX: "auto" }}>
           <table className="pmi-table">
             <thead>
@@ -272,7 +294,7 @@ function EconomyTab({ imf, simm }: { imf: IMFData | null; simm: SimmData | null 
       {/* SA data box */}
       {simm && (
         <div className="card">
-          <div className="card-header"><span className="card-title">South Africa</span><SourceBadge meta={simm._meta} /></div>
+          <div className="card-header"><span className="card-title">South Africa</span><SourceBadge meta={simm._meta} /><AddToPackBtn item={{ id: "sa-macro", title: "SA macro indicators", section: "Economy", sourceTab: "economy" }} /></div>
           <div className="sa-econ-grid">
             {[
               { label: "Repo rate",          value: `${simm.saRepo}%`,             note: "Third consecutive cut" },
@@ -364,7 +386,7 @@ function ValuationsTab({ bloomberg }: { bloomberg: BloombergData | null }) {
       {/* Charts */}
       <div className="val-charts-row">
         <div className="card">
-          <div className="card-header"><span className="card-title">Forward P/E</span></div>
+          <div className="card-header"><span className="card-title">Forward P/E</span><AddToPackBtn item={{ id: `val-pe-${market}`, title: `Forward P/E — ${market}`, section: "Valuations", sourceTab: "valuations" }} /></div>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={v.peSeries} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
               <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
@@ -378,7 +400,7 @@ function ValuationsTab({ bloomberg }: { bloomberg: BloombergData | null }) {
           </ResponsiveContainer>
         </div>
         <div className="card">
-          <div className="card-header"><span className="card-title">EPS1/EPS0 (expected earnings growth %)</span></div>
+          <div className="card-header"><span className="card-title">EPS1/EPS0 (expected earnings growth %)</span><AddToPackBtn item={{ id: `val-eps-${market}`, title: `EPS growth — ${market}`, section: "Valuations", sourceTab: "valuations" }} /></div>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={v.epsSeries} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
               <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
@@ -403,6 +425,7 @@ function ValuationsTab({ bloomberg }: { bloomberg: BloombergData | null }) {
         <div className="card-header">
           <span className="card-title">Total return matrix — {market}</span>
           <span style={{ fontSize: 11, color: "var(--text-muted)" }}>Rows = EPS growth · Cols = exit P/E · current P/E {v.currentPE}x · div yield {v.dividendYield}%</span>
+          <AddToPackBtn item={{ id: `val-matrix-${market}`, title: `Return matrix — ${market}`, section: "Valuations", sourceTab: "valuations" }} />
         </div>
         {selCell !== null && (
           <div className="vm-selected-info">
@@ -462,11 +485,14 @@ function ValuationsTab({ bloomberg }: { bloomberg: BloombergData | null }) {
 const COL_VALS = [-2, -1, 0, 1, 2] as const;
 const COL_LABEL: Record<number, string> = { "-2": "-2", "-1": "-1", "0": "0", "1": "+1", "2": "+2" };
 
-function TAARatingTable({ title, rows }: { title: string; rows: TAARatingRow[] }) {
+function TAARatingTable({ title, rows, packId }: { title: string; rows: TAARatingRow[]; packId: string }) {
   const { dispatch } = useApp();
   return (
     <div className="card">
-      <div className="card-header"><span className="card-title">{title}</span></div>
+      <div className="card-header">
+        <span className="card-title">{title}</span>
+        <AddToPackBtn item={{ id: packId, title, section: "TAA", sourceTab: "taa" }} />
+      </div>
       <table className="taa-rating-table">
         <thead>
           <tr>
@@ -514,6 +540,99 @@ function retCell(v: number, key: string) {
   return <td key={key} className={`taa-returns-cell ${cls}`}>{v > 0 ? "+" : ""}{v.toFixed(1)}</td>;
 }
 
+function taaViewLabel(v: number): string {
+  if (v === 2)  return "+2";
+  if (v === 1)  return "+1";
+  if (v === 0)  return "0";
+  if (v === -1) return "−1";
+  return "−2";
+}
+
+function alignStatus(gap: number, view: number): "aligned" | "misaligned" | "neutral" {
+  if (gap === 0 && view === 0) return "neutral";
+  if (gap > 0 && view > 0) return "aligned";
+  if (gap < 0 && view < 0) return "aligned";
+  if (gap === 0 || view === 0) return "neutral";
+  return "misaligned";
+}
+
+function PortfolioWeightsTable({ rows }: { rows: PortfolioWeight[] }) {
+  const saRows     = rows.filter(r => r.assetClass.startsWith("SA"));
+  const globalRows = rows.filter(r => !r.assetClass.startsWith("SA"));
+
+  function renderSection(label: string, section: PortfolioWeight[]) {
+    return (
+      <>
+        <tr className="pw-section-header">
+          <td colSpan={5}>{label}</td>
+        </tr>
+        {section.map(row => {
+          const gap    = +(row.actualWeight - row.benchmarkWeight).toFixed(1);
+          const status = alignStatus(gap, row.taaView);
+          const gapCls = gap > 0 ? "pw-gap-over" : gap < 0 ? "pw-gap-under" : "pw-gap-neutral";
+          const statusCls = status === "aligned" ? "pw-status-aligned" : status === "misaligned" ? "pw-status-mis" : "pw-status-neutral";
+          const viewCls = row.taaView > 0 ? "pw-view-bull" : row.taaView < 0 ? "pw-view-bear" : "pw-view-neutral";
+          return (
+            <tr key={row.assetClass} className="pw-row">
+              <td className="pw-asset">{row.assetClass}</td>
+              <td className="pw-num">{row.actualWeight.toFixed(1)}%</td>
+              <td className="pw-num pw-bench">{row.benchmarkWeight.toFixed(1)}%</td>
+              <td className={`pw-num pw-gap ${gapCls}`}>{gap > 0 ? "+" : ""}{gap.toFixed(1)}pp</td>
+              <td className={`pw-view ${viewCls}`}>{taaViewLabel(row.taaView)}</td>
+              <td className={`pw-status ${statusCls}`}>{status === "aligned" ? "✓" : status === "misaligned" ? "!" : "—"}</td>
+            </tr>
+          );
+        })}
+      </>
+    );
+  }
+
+  const totalActual    = rows.reduce((s, r) => s + r.actualWeight, 0);
+  const totalBenchmark = rows.reduce((s, r) => s + r.benchmarkWeight, 0);
+
+  return (
+    <div className="card">
+      <div className="card-header">
+        <span className="card-title">Portfolio weights vs benchmark</span>
+        <span style={{ fontSize: 11, color: "var(--text-muted)" }}>Active positions aligned to TAA views</span>
+        <AddToPackBtn item={{ id: "portfolio-weights", title: "Portfolio weights vs benchmark", section: "TAA", sourceTab: "taa" }} />
+        <div className="pw-legend-row">
+          <span className="pw-legend-dot pw-gap-over" />OW
+          <span className="pw-legend-dot pw-gap-under" style={{ marginLeft: 10 }} />UW
+          <span className="pw-legend-dot pw-status-aligned" style={{ marginLeft: 10 }} />Aligned
+          <span className="pw-legend-dot pw-status-mis" style={{ marginLeft: 10 }} />Misaligned
+        </div>
+      </div>
+      <div style={{ overflowX: "auto" }}>
+        <table className="pw-table">
+          <thead>
+            <tr>
+              <th>Asset class</th>
+              <th className="pw-num">Actual</th>
+              <th className="pw-num">Benchmark</th>
+              <th className="pw-num">Active (pp)</th>
+              <th className="pw-view">TAA view</th>
+              <th className="pw-status">Aligned</th>
+            </tr>
+          </thead>
+          <tbody>
+            {renderSection("South Africa", saRows)}
+            {renderSection("Global", globalRows)}
+            <tr className="pw-total-row">
+              <td>Total</td>
+              <td className="pw-num">{totalActual.toFixed(1)}%</td>
+              <td className="pw-num pw-bench">{totalBenchmark.toFixed(1)}%</td>
+              <td className="pw-num">—</td>
+              <td className="pw-view">—</td>
+              <td className="pw-status">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function TAATab({ ab }: { ab: AlphaBetaData | null }) {
   if (!ab) return <div className="prepare-placeholder">Loading…</div>;
 
@@ -523,9 +642,11 @@ function TAATab({ ab }: { ab: AlphaBetaData | null }) {
   return (
     <div className="macro-layout">
       <div className="taa-tables-grid">
-        <TAARatingTable title="SA TAA"     rows={ab.saTAA}     />
-        <TAARatingTable title="Global TAA" rows={ab.globalTAA} />
+        <TAARatingTable title="SA TAA"     rows={ab.saTAA}     packId="taa-sa"     />
+        <TAARatingTable title="Global TAA" rows={ab.globalTAA} packId="taa-global" />
       </div>
+
+      <PortfolioWeightsTable rows={ab.portfolioWeights} />
 
       {/* What changed */}
       {changes.length > 0 && (
@@ -546,7 +667,11 @@ function TAATab({ ab }: { ab: AlphaBetaData | null }) {
 
       {/* 10-year returns */}
       <div className="card" style={{ overflow: "hidden" }}>
-        <div className="card-header"><span className="card-title">Historical returns — global asset classes (%)</span><SourceBadge meta={ab._meta} /></div>
+        <div className="card-header">
+          <span className="card-title">Historical returns — global asset classes (%)</span>
+          <SourceBadge meta={ab._meta} />
+          <AddToPackBtn item={{ id: "taa-hist-returns", title: "Historical returns", section: "TAA", sourceTab: "taa" }} />
+        </div>
         <div style={{ overflowX: "auto" }}>
           <table className="taa-returns-table">
             <thead>
@@ -574,94 +699,251 @@ function TAATab({ ab }: { ab: AlphaBetaData | null }) {
 
 /* ─── PACK ───────────────────────────────────────────────── */
 
-function PackTab({ bloomberg, bca, imf, ab }: {
+type PackStep = "build" | "preview" | "export";
+
+function PackTab({ bloomberg: _bloomberg, bca: _bca, imf: _imf, ab: _ab }: {
   bloomberg: BloombergData | null;
   bca: BCAData | null;
   imf: IMFData | null;
   ab: AlphaBetaData | null;
 }) {
+  const { state, dispatch } = useApp();
+  const [step, setStep] = useState<PackStep>("build");
+  const [narrative, setNarrative] = useState("");
+  const [exporting, setExporting] = useState(false);
   const [exported, setExported] = useState(false);
-  const themeCount  = bca?.themes.length ?? 0;
-  const marketCount = bloomberg?.returns.length ?? 0;
-  const valCount    = 10;
+  const queue = state.packQueue;
 
-  const autoCount = 3 + themeCount + 3 + valCount + 3;
-  const needsCount = 3;
-  const total = autoCount + needsCount;
+  async function exportToPptx() {
+    setExporting(true);
+    // Dynamic import so pptxgenjs doesn't bloat the initial bundle
+    const PptxGenJS = (await import("pptxgenjs")).default;
+    const pptx = new PptxGenJS();
 
-  const SECTIONS = [
-    {
-      title: "Market returns", slides: [
-        { label: "Global index returns",        auto: true },
-        { label: "SA sector returns",           auto: true },
-        { label: `Currency & commodities (${marketCount} series)`, auto: true },
-        { label: "Selected stock commentary",   auto: false },
-      ]
-    },
-    {
-      title: "Themes", slides: (bca?.themes ?? []).map(t => ({ label: t.title, auto: true }))
-    },
-    {
-      title: "Economic data", slides: [
-        { label: "IMF growth forecasts",        auto: true },
-        { label: "Global PMI heatmap",          auto: imf !== null },
-        { label: "SA MTBPS update",             auto: true },
-      ]
-    },
-    {
-      title: `Valuations (${valCount} markets)`, slides: [
-        { label: "MSCI World — P/E + EPS + matrix", auto: true },
-        { label: "S&P 500 — P/E + EPS + matrix",    auto: true },
-        { label: "MSCI EM — P/E + EPS + matrix",    auto: true },
-        { label: "JSE ALSI — P/E + EPS + matrix",   auto: true },
-        { label: "+ 6 further markets",             auto: true },
-        { label: "Opening valuation narrative",     auto: false },
-      ]
-    },
-    {
-      title: "TAA", slides: [
-        { label: `SA TAA (${ab?.saTAA.length ?? 0} asset classes)`,     auto: true },
-        { label: `Global TAA (${ab?.globalTAA.length ?? 0} asset classes)`, auto: true },
-        { label: "What changed since last month",   auto: true },
-        { label: "CIO sign-off commentary",         auto: false },
-      ]
-    },
+    pptx.defineLayout({ name: "WIDESCREEN", width: 13.33, height: 7.5 });
+    pptx.layout = "WIDESCREEN";
+
+    // Title slide
+    const titleSlide = pptx.addSlide();
+    titleSlide.background = { color: "015376" };
+    titleSlide.addText("PM Insight — Monthly Deck", {
+      x: 0.5, y: 2.5, w: 12.33, h: 1,
+      fontSize: 32, bold: true, color: "FFFFFF", align: "center",
+    });
+    titleSlide.addText(`November 2026 · Sanlam Multi-Manager`, {
+      x: 0.5, y: 3.6, w: 12.33, h: 0.5,
+      fontSize: 16, color: "00B5ED", align: "center",
+    });
+
+    // One slide per queued item
+    for (const item of queue) {
+      const slide = pptx.addSlide();
+      // Header bar
+      slide.addShape(pptx.ShapeType.rect, {
+        x: 0, y: 0, w: 13.33, h: 0.6,
+        fill: { color: "015376" },
+      });
+      slide.addText(item.title, {
+        x: 0.3, y: 0.1, w: 10, h: 0.4,
+        fontSize: 14, bold: true, color: "FFFFFF",
+      });
+      slide.addText(`Section: ${item.section}`, {
+        x: 0.3, y: 0.75, w: 12, h: 0.3,
+        fontSize: 10, color: "5B6B77",
+      });
+      slide.addText(`[ ${item.title} chart / table exported from PM Insight ]`, {
+        x: 0.5, y: 1.5, w: 12.33, h: 4.5,
+        fontSize: 14, color: "1A2B36", align: "center", valign: "middle",
+        line: { color: "DCE4EA", width: 1, dashType: "dash" },
+      });
+    }
+
+    // Narrative slide (if filled)
+    if (narrative.trim()) {
+      const nSlide = pptx.addSlide();
+      nSlide.background = { color: "F5F8FA" };
+      nSlide.addShape(pptx.ShapeType.rect, {
+        x: 0, y: 0, w: 13.33, h: 0.6,
+        fill: { color: "015376" },
+      });
+      nSlide.addText("PM Narrative", {
+        x: 0.3, y: 0.1, w: 10, h: 0.4,
+        fontSize: 14, bold: true, color: "FFFFFF",
+      });
+      nSlide.addText(narrative, {
+        x: 0.5, y: 0.9, w: 12.33, h: 5.5,
+        fontSize: 13, color: "1A2B36", valign: "top",
+      });
+    }
+
+    await pptx.writeFile({ fileName: "pm-insight-deck-nov-2026.pptx" });
+    setExporting(false);
+    setExported(true);
+    setTimeout(() => setExported(false), 4000);
+  }
+
+  const STEP_LABELS: Array<{ id: PackStep; label: string }> = [
+    { id: "build",   label: "1 · Build" },
+    { id: "preview", label: "2 · Preview" },
+    { id: "export",  label: "3 · Export" },
   ];
 
   return (
-    <div className="monday-layout">
-      <div className="monday-header-row">
-        <div>
-          <div className="monday-title">Monthly deck · November 2026</div>
-          <div className="monday-subtitle">
-            Slides auto-filled: <strong>{autoCount}</strong> of <strong>{total}</strong> · {needsCount} need your input
-          </div>
-        </div>
-        <div className="monday-header-actions">
-          <button className="btn-outline" onClick={() => { setExported(true); setTimeout(() => setExported(false), 3000); }}>
-            {exported ? "Export queued ✓" : "Export to PowerPoint"}
+    <div className="pack-layout">
+      {/* Stepper */}
+      <div className="pack-stepper">
+        {STEP_LABELS.map((s, i) => (
+          <button
+            key={s.id}
+            className={`pack-step-btn${step === s.id ? " active" : ""}${i < STEP_LABELS.findIndex(x => x.id === step) ? " done" : ""}`}
+            onClick={() => setStep(s.id)}
+          >
+            {s.label}
           </button>
-        </div>
+        ))}
       </div>
 
-      {SECTIONS.map(sec => (
-        <div key={sec.title} className="card monday-section">
-          <div className="monday-section-header">
-            <span className="monday-section-title">{sec.title}</span>
-            <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{sec.slides.filter(s => s.auto).length} / {sec.slides.length} auto</span>
-          </div>
-          <div className="pack-slide-list">
-            {sec.slides.map((slide, i) => (
-              <div key={i} className={`pack-slide${slide.auto ? "" : " pack-slide-needs"}`}>
-                <span className="pack-slide-label">{slide.label}</span>
-                <span className={`monday-badge ${slide.auto ? "monday-badge-auto" : "monday-badge-needs"}`}>
-                  {slide.auto ? "Auto-filled" : "Needs input"}
-                </span>
+      {/* ── STEP 1: BUILD ── */}
+      {step === "build" && (
+        <div className="macro-layout">
+          {queue.length === 0 ? (
+            <div className="prepare-placeholder">
+              No slides in queue yet.{" "}
+              Hit the <strong>+</strong> button on any chart or table in Markets, Economy, Valuations or TAA tabs to add it here.
+            </div>
+          ) : (
+            <div className="card">
+              <div className="card-header">
+                <span className="card-title">Slide queue ({queue.length})</span>
+                <button className="btn-ghost-sm" style={{ color: "var(--negative)" }} onClick={() => dispatch({ type: "CLEAR_PACK" })}>
+                  Clear all
+                </button>
               </div>
-            ))}
+              <div className="pack-queue-list">
+                {queue.map((item, idx) => (
+                  <div key={item.id} className="pack-queue-row">
+                    <span className="pack-queue-idx">{idx + 1}</span>
+                    <div className="pack-queue-info">
+                      <span className="pack-queue-title">{item.title}</span>
+                      <span className="pack-queue-section">{item.section}</span>
+                    </div>
+                    <div className="pack-queue-actions">
+                      <button className="pack-queue-move" disabled={idx === 0}
+                        onClick={() => dispatch({ type: "REORDER_PACK", fromIndex: idx, toIndex: idx - 1 })}>↑</button>
+                      <button className="pack-queue-move" disabled={idx === queue.length - 1}
+                        onClick={() => dispatch({ type: "REORDER_PACK", fromIndex: idx, toIndex: idx + 1 })}>↓</button>
+                      <button className="pack-queue-remove"
+                        onClick={() => dispatch({ type: "REMOVE_FROM_PACK", id: item.id })}>✕</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* PM Narrative */}
+          <div className="card">
+            <div className="card-header">
+              <span className="card-title">PM narrative (optional)</span>
+              <span className="monday-ai-label">Last slide</span>
+            </div>
+            <textarea
+              className="monday-editor"
+              style={{ minHeight: 100 }}
+              placeholder="Add your overall narrative or key messages for this month's deck…"
+              value={narrative}
+              onChange={e => setNarrative(e.target.value)}
+            />
+          </div>
+
+          {queue.length > 0 && (
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <button className="btn-outline" onClick={() => setStep("preview")}>
+                Preview deck →
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── STEP 2: PREVIEW ── */}
+      {step === "preview" && (
+        <div className="macro-layout">
+          <div className="pack-preview-header">
+            <span className="pack-preview-count">{queue.length + 1 + (narrative.trim() ? 1 : 0)} slides total</span>
+            <span style={{ fontSize: 12, color: "var(--text-muted)" }}>(1 title + {queue.length} content{narrative.trim() ? " + 1 narrative" : ""})</span>
+          </div>
+
+          {/* Title slide preview */}
+          <div className="pack-preview-slide" style={{ background: "#015376" }}>
+            <div className="pack-preview-slide-inner">
+              <div style={{ fontSize: 20, fontWeight: 700, color: "#fff", textAlign: "center" }}>PM Insight — Monthly Deck</div>
+              <div style={{ fontSize: 13, color: "#00B5ED", textAlign: "center", marginTop: 6 }}>November 2026 · Sanlam Multi-Manager</div>
+            </div>
+          </div>
+
+          {queue.map((item, idx) => (
+            <div key={item.id} className="pack-preview-slide">
+              <div className="pack-preview-slide-bar" />
+              <div className="pack-preview-slide-inner">
+                <div className="pack-preview-slide-num">Slide {idx + 2}</div>
+                <div className="pack-preview-slide-title">{item.title}</div>
+                <div className="pack-preview-slide-section">{item.section}</div>
+                <div className="pack-preview-placeholder">[ {item.title} ]</div>
+              </div>
+            </div>
+          ))}
+
+          {narrative.trim() && (
+            <div className="pack-preview-slide" style={{ background: "var(--surface-2)" }}>
+              <div className="pack-preview-slide-bar" />
+              <div className="pack-preview-slide-inner">
+                <div className="pack-preview-slide-num">Slide {queue.length + 2}</div>
+                <div className="pack-preview-slide-title">PM Narrative</div>
+                <div style={{ fontSize: 12, color: "var(--text)", marginTop: 8, lineHeight: 1.6 }}>{narrative}</div>
+              </div>
+            </div>
+          )}
+
+          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+            <button className="btn-outline" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }} onClick={() => setStep("build")}>
+              ← Edit
+            </button>
+            <button className="btn-outline" onClick={() => setStep("export")}>Export →</button>
           </div>
         </div>
-      ))}
+      )}
+
+      {/* ── STEP 3: EXPORT ── */}
+      {step === "export" && (
+        <div className="macro-layout">
+          <div className="card">
+            <div className="card-header"><span className="card-title">Export deck</span></div>
+            <div className="pack-export-summary">
+              <div className="pack-export-row"><span>Total slides</span><strong>{queue.length + 1 + (narrative.trim() ? 1 : 0)}</strong></div>
+              <div className="pack-export-row"><span>Content slides</span><strong>{queue.length}</strong></div>
+              <div className="pack-export-row"><span>Narrative</span><strong>{narrative.trim() ? "Included" : "Not added"}</strong></div>
+              <div className="pack-export-row"><span>Format</span><strong>.pptx (PowerPoint)</strong></div>
+            </div>
+            <div style={{ marginTop: 20, display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <button
+                className="btn-outline"
+                style={{ background: exporting ? "var(--surface-2)" : undefined }}
+                disabled={exporting || queue.length === 0}
+                onClick={exportToPptx}
+              >
+                {exporting ? "Building…" : exported ? "Downloaded ✓" : "Download .pptx"}
+              </button>
+              <button className="btn-ghost-sm" onClick={() => setStep("preview")}>← Preview</button>
+            </div>
+            {queue.length === 0 && (
+              <div style={{ marginTop: 12, fontSize: 12, color: "var(--warning)" }}>
+                No slides in queue. Go to Build step and add slides with the + buttons.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
