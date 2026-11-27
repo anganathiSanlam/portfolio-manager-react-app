@@ -89,6 +89,39 @@
 
 /* ── MANAGER PROFILE ── */
 .profile-layout { display: grid; gap: 14px; }
+/* ── FUND DROPDOWN SELECTOR ── */
+.research-fund-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--brand-accent-soft);
+  border: 1px solid var(--brand-accent-mid, #B3E5F7);
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+.research-fund-label {
+  font-size: 11px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--brand-primary);
+  white-space: nowrap;
+}
+.research-fund-select {
+  flex: 1;
+  min-width: 200px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+}
+.research-fund-select:focus { outline: none; border-color: var(--brand-primary); }
+.research-fund-meta { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+
+/* ── (legacy, kept for safety) ── */
 .profile-selector {
   display: flex;
   flex-wrap: wrap;

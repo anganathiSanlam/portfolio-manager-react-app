@@ -1,11 +1,4 @@
-.page-heading {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 28px;
-  flex-wrap: wrap;
-}
+.page-heading { display: none; }
 
 .page-heading-text {}
 .page-heading h1 {
@@ -15,10 +8,6 @@
   letter-spacing: -.5px;
 }
 .page-heading h1 { color: var(--brand-primary); }
-.page-heading-sub {
-  margin-top: 4px;
-  color: var(--text-muted);
-  font-size: 13px;
-}
+.page-heading-sub { display: none; }
 
 .page-heading-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }

@@ -136,7 +136,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 /* ============================================================
    PAGE TABS — shared accessible tab bar
    ============================================================ */
-.tabs-wrapper { display: flex; flex-direction: column; }
+.tabs-wrapper {
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  padding-top: 2px;
+}
 
 .page-tabs {
   display: flex;

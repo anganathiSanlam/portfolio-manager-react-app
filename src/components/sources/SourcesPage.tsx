@@ -1,274 +1,317 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Tabs from "../common/tabs/Tabs";
 import { useActiveTab } from "../common/tabs/useActiveTab";
-import SourceBadge from "../common/source-badge/SourceBadge";
-import { getSakanaData } from "../../connectors/sakana";
 import { auditRecords } from "../../data";
-import type { ConnectorMeta } from "../../connectors/types";
 import "./sources.css";
 
 const TABS = [
-  { id: "connectors", label: "Connectors" },
-  { id: "datahealth", label: "Data health" },
-  { id: "audit",      label: "Audit trail" },
+  { id: "platforms", label: "Platforms" },
+  { id: "tools",     label: "Tools" },
+  { id: "markets",   label: "Markets" },
+  { id: "audit",     label: "Audit trail" },
 ];
 
 export default function SourcesPage() {
-  const tab = useActiveTab("sources", "connectors");
+  const tab = useActiveTab("sources", "platforms");
 
   return (
     <div>
       <div className="page-heading">
         <div className="page-heading-text">
           <h1>Sources</h1>
-          <p className="page-heading-sub">Connected tools, data health and audit trail</p>
+          <p className="page-heading-sub">Quick access to platforms, tools and market data</p>
         </div>
       </div>
       <Tabs page="sources" tabs={TABS} />
-      {tab === "connectors" && <ConnectorsTab />}
-      {tab === "datahealth" && <DataHealthTab />}
-      {tab === "audit"      && <AuditTab />}
+      {tab === "platforms" && <AppTab category="platforms" />}
+      {tab === "tools"     && <AppTab category="tools" />}
+      {tab === "markets"   && <AppTab category="markets" />}
+      {tab === "audit"     && <AuditTab />}
     </div>
   );
 }
 
-/* ─── CONNECTORS ─────────────────────────────────────────── */
+/* ─── SHARED TYPES ────────────────────────────────────────── */
 
-type ConnectorStatus = "live" | "simulated" | "late" | "pending";
+type AppStatus = "live" | "simulated" | "pending";
 
-interface ConnectorCard {
+interface AppEntry {
   id: string;
   name: string;
-  status: ConnectorStatus;
+  tagline: string;
+  url: string;
+  status: AppStatus;
   statusLabel: string;
-  lastUpdate: string;
-  provides: string[];
-  usedBy: string[];
-  url?: string;
+  custom?: boolean;
 }
 
-const CONNECTORS: ConnectorCard[] = [
-  { id: "bloomberg",        name: "Bloomberg",          status: "simulated", statusLabel: "Simulated", lastUpdate: "31 Oct 2026", provides: ["Market returns (MTD/QTD/1M, USD & ZAR)", "Forward P/E series", "EPS growth series", "10 market valuations"], usedBy: ["Prepare → Markets & themes", "Prepare → Valuations", "Prepare → Pack"], url: "https://www.bloomberg.com/professional" },
-  { id: "iress",            name: "IRESS",              status: "simulated", statusLabel: "Simulated", lastUpdate: "31 Oct 2026", provides: ["SA sector returns", "JSE indices", "SA bond index (ALBI)", "STeFI"], usedBy: ["Prepare → Markets & themes"], url: "https://www.iress.com" },
-  { id: "bca-research",     name: "BCA Research",       status: "simulated", statusLabel: "Simulated", lastUpdate: "23 Nov 2026", provides: ["Theme cards", "Narrative drafts", "Chart data per theme"], usedBy: ["Prepare → Markets & themes", "Prepare → Pack"], url: "https://www.bcaresearch.com" },
-  { id: "imf",              name: "IMF",                status: "simulated", statusLabel: "Simulated", lastUpdate: "Oct 2026",    provides: ["GDP growth forecasts", "Inflation forecasts", "Global PMI heatmap"], usedBy: ["Prepare → Economy"], url: "https://www.imf.org/en/publications/weo" },
-  { id: "simm-internal",    name: "SIMM Internal",      status: "simulated", statusLabel: "Simulated", lastUpdate: "23 Nov 2026", provides: ["SA repo rate", "SA CPI", "MTBPS data", "USD/ZAR"], usedBy: ["Prepare → Economy"], url: "https://sanlam.internal" },
-  { id: "alphabeta",        name: "AlphaBeta",          status: "simulated", statusLabel: "Simulated", lastUpdate: "22 Nov 2026", provides: ["Fund screening", "Quartile history", "House view", "SA TAA", "Global TAA", "10-year returns"], usedBy: ["Research → Screening", "Prepare → TAA"], url: "https://www.alphabeta.com" },
-  { id: "evestments",       name: "eVestments",         status: "simulated", statusLabel: "Simulated", lastUpdate: "22 Nov 2026", provides: ["Institutional analytics", "Peer universe rankings", "Attribution"], usedBy: ["Research → Screening", "Research → Manager profile"], url: "https://app.evestments.com" },
-  { id: "portfolio-builder",name: "PortfolioBuilder",   status: "simulated", statusLabel: "Simulated", lastUpdate: "22 Nov 2026", provides: ["Allocation targets", "Allowed ranges", "Efficient frontier"], usedBy: ["Research → Asset allocation"], url: "https://portfoliobuilder.sanlam.com" },
-  { id: "performance-system",name: "Performance System",status: "simulated", statusLabel: "Simulated", lastUpdate: "22 Nov 2026", provides: ["Fund returns vs benchmark", "Portfolio growth series", "Fee breakdown"], usedBy: ["Research → Manager profile", "Present → Client story"], url: "https://performance.sanlam.internal" },
-  { id: "sakana",           name: "Sakana",             status: "pending",   statusLabel: "Pending setup", lastUpdate: "—",        provides: ["TBC — pending API credentials"], usedBy: [], url: "https://sakana.ai" },
+interface CustomApp { id: string; name: string; url: string; description: string; }
+
+type Category = "platforms" | "tools" | "markets";
+
+/* ─── HARDCODED APPS PER CATEGORY ────────────────────────── */
+
+const PLATFORM_APPS: AppEntry[] = [
+  {
+    id: "ninetyone",
+    name: "NinetyOne",
+    tagline: "LISP platform — lock in and manage client trade instructions",
+    url: "https://www.ninetyone.com",
+    status: "live",
+    statusLabel: "Live",
+  },
+  {
+    id: "oldmutual",
+    name: "Old Mutual",
+    tagline: "LISP and investment platform — submit and track portfolio trades",
+    url: "https://www.oldmutual.co.za",
+    status: "live",
+    statusLabel: "Live",
+  },
+  {
+    id: "sanlam-wealth",
+    name: "Sanlam Wealth",
+    tagline: "LISP platform for Sanlam-managed portfolios and trade submissions",
+    url: "https://www.sanlam.co.za/wealthmanagement",
+    status: "live",
+    statusLabel: "Live",
+  },
+  {
+    id: "glacier",
+    name: "Glacier Invest",
+    tagline: "LISP platform — fund switches, purchases and trade tracking",
+    url: "https://www.glacier.co.za",
+    status: "live",
+    statusLabel: "Live",
+  },
 ];
 
-const STATUS_COLORS: Record<ConnectorStatus, { bg: string; text: string }> = {
-  live:      { bg: "var(--positive-bg)",  text: "var(--positive)"  },
-  simulated: { bg: "var(--brand-accent-soft)", text: "var(--brand-primary)" },
-  late:      { bg: "var(--warning-bg)",   text: "var(--warning)"   },
-  pending:   { bg: "var(--surface-2)",    text: "var(--text-muted)" },
+const TOOL_APPS: AppEntry[] = [
+  {
+    id: "portfolio-builder",
+    name: "PortfolioBuilder",
+    tagline: "Internal tool — build allocation targets, ranges and efficient frontiers",
+    url: "https://portfoliobuilder.sanlam.com",
+    status: "simulated",
+    statusLabel: "Simulated",
+  },
+  {
+    id: "alphabeta",
+    name: "AlphaBeta",
+    tagline: "Fund screening, quartile history, house view and TAA analytics",
+    url: "https://www.alphabeta.com",
+    status: "simulated",
+    statusLabel: "Simulated",
+  },
+  {
+    id: "evestments",
+    name: "eVestments",
+    tagline: "Institutional analytics — peer rankings, attribution and manager due diligence",
+    url: "https://app.evestments.com",
+    status: "simulated",
+    statusLabel: "Simulated",
+  },
+  {
+    id: "sakana",
+    name: "Sakana",
+    tagline: "AI research assistant — pending API credentials and integration setup",
+    url: "https://sakana.ai",
+    status: "pending",
+    statusLabel: "Pending setup",
+  },
+];
+
+const MARKET_APPS: AppEntry[] = [
+  {
+    id: "bloomberg",
+    name: "Bloomberg",
+    tagline: "Market returns, valuations, EPS growth and global financial data",
+    url: "https://www.bloomberg.com/professional",
+    status: "simulated",
+    statusLabel: "Simulated",
+  },
+  {
+    id: "trading-economics",
+    name: "Trading Economics",
+    tagline: "Macro indicators, GDP, inflation, rates and country-level economic data",
+    url: "https://tradingeconomics.com",
+    status: "live",
+    statusLabel: "Live",
+  },
+  {
+    id: "imf",
+    name: "IMF — World Economic Outlook",
+    tagline: "GDP growth and inflation forecasts, global PMI heatmap",
+    url: "https://www.imf.org/en/publications/weo",
+    status: "live",
+    statusLabel: "Live",
+  },
+  {
+    id: "bca-research",
+    name: "BCA Research",
+    tagline: "Independent macro research — theme cards, narratives and chart data",
+    url: "https://www.bcaresearch.com",
+    status: "simulated",
+    statusLabel: "Simulated",
+  },
+];
+
+const CATEGORY_DATA: Record<Category, { apps: AppEntry[]; storageKey: string; emptyHint: string }> = {
+  platforms: {
+    apps: PLATFORM_APPS,
+    storageKey: "pm-apps-platforms",
+    emptyHint: "Add a trading platform or LISP portal the team uses.",
+  },
+  tools: {
+    apps: TOOL_APPS,
+    storageKey: "pm-apps-tools",
+    emptyHint: "Add an internal tool or analytics platform.",
+  },
+  markets: {
+    apps: MARKET_APPS,
+    storageKey: "pm-apps-markets",
+    emptyHint: "Add a market data or economic research site.",
+  },
 };
 
-interface CustomLink { id: string; name: string; url: string; description: string; }
+const STATUS_COLORS: Record<AppStatus, { bg: string; text: string }> = {
+  live:      { bg: "var(--positive-bg)",       text: "var(--positive)"   },
+  simulated: { bg: "var(--brand-accent-soft)",  text: "var(--brand-primary)" },
+  pending:   { bg: "var(--surface-2)",          text: "var(--text-muted)" },
+};
 
-function ConnectorsTab() {
-  const [sakana, setSakana] = useState<string | null>(null);
-  const [customLinks, setCustomLinks] = useState<CustomLink[]>(() => {
-    try { return JSON.parse(localStorage.getItem("pm-custom-links") || "[]"); } catch { return []; }
+/* ─── APP TAB (shared by platforms / tools / markets) ─────── */
+
+function AppTab({ category }: { category: Category }) {
+  const { apps, storageKey, emptyHint } = CATEGORY_DATA[category];
+
+  const [customApps, setCustomApps] = useState<CustomApp[]>(() => {
+    try { return JSON.parse(localStorage.getItem(storageKey) || "[]"); } catch { return []; }
   });
-  const [linkForm, setLinkForm] = useState({ name: "", url: "", description: "" });
+  const [form, setForm] = useState({ name: "", url: "", description: "" });
   const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => { getSakanaData().then(d => setSakana(d.message)); }, []);
-
-  function addLink() {
-    if (!linkForm.name.trim() || !linkForm.url.trim()) return;
-    const link: CustomLink = { id: String(Date.now()), name: linkForm.name.trim(), url: linkForm.url.trim(), description: linkForm.description.trim() };
-    const updated = [...customLinks, link];
-    setCustomLinks(updated);
-    try { localStorage.setItem("pm-custom-links", JSON.stringify(updated)); } catch {}
-    setLinkForm({ name: "", url: "", description: "" });
+  function addApp() {
+    if (!form.name.trim() || !form.url.trim()) return;
+    const entry: CustomApp = {
+      id: String(Date.now()),
+      name: form.name.trim(),
+      url: form.url.trim(),
+      description: form.description.trim(),
+    };
+    const updated = [...customApps, entry];
+    setCustomApps(updated);
+    try { localStorage.setItem(storageKey, JSON.stringify(updated)); } catch {}
+    setForm({ name: "", url: "", description: "" });
     setShowForm(false);
   }
 
-  function deleteLink(id: string) {
-    const updated = customLinks.filter(l => l.id !== id);
-    setCustomLinks(updated);
-    try { localStorage.setItem("pm-custom-links", JSON.stringify(updated)); } catch {}
+  function deleteApp(id: string) {
+    const updated = customApps.filter(a => a.id !== id);
+    setCustomApps(updated);
+    try { localStorage.setItem(storageKey, JSON.stringify(updated)); } catch {}
   }
 
   return (
     <div className="sources-layout">
-      <div className="connectors-grid">
-        {CONNECTORS.map(c => {
-          const sc = STATUS_COLORS[c.status];
+      {/* Hardcoded app cards */}
+      <div className="app-cards-grid">
+        {apps.map(app => {
+          const sc = STATUS_COLORS[app.status];
           return (
-            <div key={c.id} className="connector-card card">
-              <div className="connector-header">
-                <span className="connector-name">{c.name}</span>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  {c.url && (
-                    <a href={c.url} target="_blank" rel="noopener noreferrer" className="connector-open-btn">Open ↗</a>
-                  )}
-                  <span className="connector-badge" style={{ background: sc.bg, color: sc.text }}>
-                    {c.statusLabel}
-                  </span>
-                </div>
+            <div key={app.id} className="app-card card">
+              <div className="app-card-header">
+                <span className="app-card-name">{app.name}</span>
+                <span className="app-status-badge" style={{ background: sc.bg, color: sc.text }}>
+                  {app.statusLabel}
+                </span>
               </div>
-              <div className="connector-update">Last update: {c.lastUpdate}</div>
-              <div className="connector-section-label">Provides</div>
-              <ul className="connector-list">
-                {c.provides.map(p => <li key={p}>{p}</li>)}
-              </ul>
-              {c.usedBy.length > 0 && (
-                <>
-                  <div className="connector-section-label">Used by</div>
-                  <div className="connector-used-by">
-                    {c.usedBy.map(u => <span key={u} className="connector-used-tag">{u}</span>)}
-                  </div>
-                </>
-              )}
-              {c.id === "sakana" && sakana && (
-                <div className="connector-pending-note">{sakana}</div>
-              )}
+              <p className="app-card-tagline">{app.tagline}</p>
+              <a
+                href={app.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="app-open-btn"
+              >
+                Open {app.name} ↗
+              </a>
             </div>
           );
         })}
       </div>
 
-      {/* Custom links panel */}
-      <div className="custom-links-section">
-        <div className="custom-links-header">
-          <span className="custom-links-title">Custom links</span>
+      {/* Custom apps section */}
+      <div className="custom-apps-section">
+        <div className="custom-apps-header">
+          <span className="custom-apps-title">My apps</span>
           <button className="macro-add-btn" onClick={() => setShowForm(s => !s)}>
-            {showForm ? "✕ Cancel" : "+ Add link"}
+            {showForm ? "✕ Cancel" : "+ Add app"}
           </button>
         </div>
+
         {showForm && (
-          <div className="custom-link-form card">
+          <div className="app-add-form card">
             <div className="macro-form-grid">
               <div className="macro-form-field">
                 <label className="macro-form-label">Name *</label>
-                <input className="macro-form-input" value={linkForm.name} onChange={e => setLinkForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Bloomberg terminal" />
+                <input
+                  className="macro-form-input"
+                  value={form.name}
+                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                  placeholder="e.g. Morningstar Direct"
+                />
               </div>
               <div className="macro-form-field">
                 <label className="macro-form-label">URL *</label>
-                <input className="macro-form-input" value={linkForm.url} onChange={e => setLinkForm(f => ({ ...f, url: e.target.value }))} placeholder="https://..." />
+                <input
+                  className="macro-form-input"
+                  value={form.url}
+                  onChange={e => setForm(f => ({ ...f, url: e.target.value }))}
+                  placeholder="https://..."
+                />
               </div>
             </div>
             <div className="macro-form-field macro-form-full">
               <label className="macro-form-label">Description</label>
-              <input className="macro-form-input" value={linkForm.description} onChange={e => setLinkForm(f => ({ ...f, description: e.target.value }))} placeholder="What is this link for?" />
+              <input
+                className="macro-form-input"
+                value={form.description}
+                onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                placeholder="What do you use this for?"
+              />
             </div>
             <div className="macro-form-actions">
-              <button className="btn-outline" onClick={addLink}>Add link</button>
+              <button className="btn-outline" onClick={addApp}>Add app</button>
               <button className="btn-ghost-sm" onClick={() => setShowForm(false)}>Cancel</button>
             </div>
           </div>
         )}
-        {customLinks.length > 0 && (
-          <div className="custom-link-grid">
-            {customLinks.map(l => (
-              <div key={l.id} className="custom-link-card card">
-                <div className="custom-link-header">
-                  <span className="custom-link-name">{l.name}</span>
-                  <button className="macro-custom-delete" onClick={() => deleteLink(l.id)}>×</button>
+
+        {customApps.length > 0 && (
+          <div className="app-cards-grid">
+            {customApps.map(a => (
+              <div key={a.id} className="app-card app-card-custom card">
+                <div className="app-card-header">
+                  <span className="app-card-name">{a.name}</span>
+                  <button className="app-delete-btn" onClick={() => deleteApp(a.id)} title="Remove">×</button>
                 </div>
-                {l.description && <div className="custom-link-desc">{l.description}</div>}
-                <a href={l.url} target="_blank" rel="noopener noreferrer" className="connector-open-btn" style={{ marginTop: 8, display: "inline-block" }}>
-                  {l.url.replace(/^https?:\/\//, "")} ↗
+                {a.description && <p className="app-card-tagline">{a.description}</p>}
+                <a
+                  href={a.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="app-open-btn"
+                >
+                  Open ↗
                 </a>
               </div>
             ))}
           </div>
         )}
-        {customLinks.length === 0 && !showForm && (
-          <div style={{ fontSize: 12, color: "var(--text-muted)", fontStyle: "italic", padding: "10px 0" }}>
-            No custom links yet. Add a link to any external tool, report, or resource.
-          </div>
+
+        {customApps.length === 0 && !showForm && (
+          <p className="custom-apps-empty">{emptyHint}</p>
         )}
-      </div>
-
-      {/* Conflict example */}
-      <div className="card conflict-card">
-        <div className="card-header">
-          <span className="card-title">⚠ Data conflict — example</span>
-          <span className="connector-badge" style={{ background: "var(--warning-bg)", color: "var(--warning)" }}>Needs resolution</span>
-        </div>
-        <p className="conflict-desc">
-          Two sources report different October returns for <strong>Moderate portfolio</strong>.
-          Choose the value to use for dependent calculations.
-        </p>
-        <div className="conflict-options">
-          {[
-            { source: "Performance System", value: "+8.4% (Oct)", meta: { source: "Performance System", asOf: "22 Nov 17:30", simulated: true } as ConnectorMeta },
-            { source: "Platform Report",    value: "+8.1% (Oct)", meta: { source: "Platform Report", asOf: "22 Nov 07:45", simulated: true } as ConnectorMeta },
-          ].map(opt => (
-            <div key={opt.source} className="conflict-option">
-              <div className="conflict-option-source">{opt.source}</div>
-              <div className="conflict-option-value">{opt.value}</div>
-              <SourceBadge meta={opt.meta} />
-              <button className="conflict-use-btn">Use this value</button>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ─── DATA HEALTH ─────────────────────────────────────────── */
-
-const FEEDS = [
-  { feed: "Markets / FX / yields",       asOf: "08:02 today",    check: "Fresh",                    status: "ok"      },
-  { feed: "Portfolio positions / returns",asOf: "16 Nov close",   check: "Return conflict",           status: "warn"    },
-  { feed: "Fund holdings",                asOf: "31 Oct 2026",    check: "Expected monthly lag",      status: "ok"      },
-  { feed: "Cash / flows",                 asOf: "07:50 today",    check: "Reconciled",                status: "ok"      },
-  { feed: "Calendar / documents",         asOf: "11 Nov 2026",    check: "Current",                   status: "ok"      },
-  { feed: "Mandate checks",               asOf: "08:02 today",    check: "247 / 248 passed",          status: "ok"      },
-  { feed: "Manager fee schedules",        asOf: "1 Sep 2026",     check: "Agreed schedule",           status: "ok"      },
-  { feed: "Platform reports",             asOf: "07:45 today",    check: "Source variance",           status: "warn"    },
-];
-
-function DataHealthTab() {
-  return (
-    <div className="sources-layout">
-      <div className="dh-metric-row">
-        {[
-          { label: "Feeds current",  value: "7 / 8", note: "1 source variance" },
-          { label: "Checks passed",  value: "247 / 248", note: "1 consistency exception" },
-          { label: "Needs a person", value: "1 conflict", note: "October Moderate return" },
-        ].map(m => (
-          <div key={m.label} className="dh-metric-card card">
-            <div className="dh-metric-label">{m.label}</div>
-            <div className="dh-metric-value">{m.value}</div>
-            <div className="dh-metric-note">{m.note}</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-        <table className="dh-table">
-          <thead>
-            <tr>
-              <th>Feed</th>
-              <th>As of</th>
-              <th>Check</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {FEEDS.map(f => (
-              <tr key={f.feed} className={`dh-row${f.status === "warn" ? " dh-row-warn" : ""}`}>
-                <td className="dh-feed-name">{f.feed}</td>
-                <td className="dh-as-of">{f.asOf}</td>
-                <td>{f.check}</td>
-                <td>
-                  <span className={`dh-status-dot${f.status === "warn" ? " warn" : ""}`} />
-                  {f.status === "warn" ? "Review" : "OK"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
     </div>
   );
@@ -293,9 +336,9 @@ function AuditTab() {
         />
         <div className="audit-metric-row">
           {[
-            { label: "Events today", value: String(auditRecords.length) },
+            { label: "Events today",   value: String(auditRecords.length) },
             { label: "Open / Flagged", value: String(auditRecords.filter(r => r.status === "Open" || r.status === "Flagged").length) },
-            { label: "Confirmed", value: String(auditRecords.filter(r => r.status === "Confirmed").length) },
+            { label: "Confirmed",      value: String(auditRecords.filter(r => r.status === "Confirmed").length) },
           ].map(m => (
             <div key={m.label} className="audit-mini-metric">
               <span className="audit-mini-label">{m.label}</span>

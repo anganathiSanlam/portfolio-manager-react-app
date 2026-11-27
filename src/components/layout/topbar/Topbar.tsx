@@ -1,5 +1,5 @@
 import { useApp } from "../../../context/AppContext";
-import { navigation, portfolios, auditRecords } from "../../../data";
+import { navigation, auditRecords } from "../../../data";
 
 const flaggedCount = auditRecords.filter((r) => r.status === "Open" || r.status === "Flagged").length;
 
@@ -8,22 +8,12 @@ export default function Topbar() {
 
   const current = navigation.find((n) => n.id === state.activeSection);
 
-  function cyclePortfolio() {
-    const idx = portfolios.findIndex((p) => p.name === state.portfolio);
-    const next = portfolios[(idx + 1) % portfolios.length];
-    dispatch({ type: "SET_PORTFOLIO", name: next.name });
-  }
-
   return (
     <header className="topbar">
       <span className="topbar-title">
         {current?.label ?? "Dashboard"}
       </span>
       <div className="topbar-actions">
-        <button className="portfolio-select" onClick={cyclePortfolio} title="Switch portfolio">
-          <span className="portfolio-select-name">{state.portfolio}</span>
-          <span className="portfolio-select-arrow">▾</span>
-        </button>
         <button
           className={`icon-btn topbar-audit-btn${state.auditPanelOpen ? " active" : ""}`}
           title="Audit log"

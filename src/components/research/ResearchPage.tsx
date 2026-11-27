@@ -616,17 +616,25 @@ function ManagerProfileTab({ perf, ab }: { perf: PerformanceData | null; ab: Alp
       </div>
 
       {/* Fund selector */}
-      <div className="profile-selector">
-        {funds.map(f => (
-          <button
-            key={f.id}
-            className={`profile-fund-btn${selectedId === f.id ? " active" : ""}`}
-            onClick={() => dispatch({ type: "SET_SELECTED_FUND", id: f.id })}
+      {funds.length > 0 && (
+        <div className="research-fund-selector">
+          <span className="research-fund-label">Fund</span>
+          <select
+            className="research-fund-select"
+            value={selectedId}
+            onChange={e => dispatch({ type: "SET_SELECTED_FUND", id: e.target.value })}
           >
-            {f.name}
-          </button>
-        ))}
-      </div>
+            {funds.map(f => (
+              <option key={f.id} value={f.id}>{f.name}</option>
+            ))}
+          </select>
+          {fundRow && (
+            <span className="research-fund-meta">
+              {fundRow.assetClass} · {fundRow.style} · Q{fundRow.currentQuartile} · {fundRow.fee.toFixed(2)}%
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Ratings tab */}
       {profileTab === "ratings" && <RatingsTab selectedId={selectedId} />}
@@ -1298,16 +1306,22 @@ function MeetingPrepTab({ perf, ab }: { perf: PerformanceData | null; ab: AlphaB
     <div className="meetprep-layout">
       {/* Fund selector */}
       {funds.length > 0 && (
-        <div className="profile-selector">
-          {funds.map(f => (
-            <button
-              key={f.id}
-              className={`profile-fund-btn${selectedId === f.id ? " active" : ""}`}
-              onClick={() => dispatch({ type: "SET_SELECTED_FUND", id: f.id })}
-            >
-              {f.name}
-            </button>
-          ))}
+        <div className="research-fund-selector">
+          <span className="research-fund-label">Fund</span>
+          <select
+            className="research-fund-select"
+            value={selectedId}
+            onChange={e => dispatch({ type: "SET_SELECTED_FUND", id: e.target.value })}
+          >
+            {funds.map(f => (
+              <option key={f.id} value={f.id}>{f.name}</option>
+            ))}
+          </select>
+          {fundData && (
+            <span className="research-fund-meta">
+              {fundData.assetClass} · Q{fundData.currentQuartile}
+            </span>
+          )}
         </div>
       )}
 
